@@ -5,7 +5,6 @@ import bgPattern from '../assets/bg-pattern.svg';
 const QuizPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative">
-      {/* Background Pattern */}
       <div 
         className="fixed inset-0 pointer-events-none opacity-10"
         style={{
@@ -16,7 +15,6 @@ const QuizPage = () => {
         }}
       ></div>
 
-      {/* Content */}
       <div className="relative z-10">
         <QuizContainer />
       </div>

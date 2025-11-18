@@ -38,7 +38,6 @@ const QuizHeader = ({
         </div>
       </div>
 
-      {/* Progress Bar */}
       <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
         <div 
           className={`h-full transition-all duration-300 ${isWarning ? 'bg-red-400' : 'bg-green-400'}`}

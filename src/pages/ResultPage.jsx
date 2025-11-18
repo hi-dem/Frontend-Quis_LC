@@ -78,11 +78,9 @@ const ResultPage = () => {
       
       <div className="relative z-10 flex-1 p-4 md:p-6 overflow-y-auto">
         <div className="max-w-3xl mx-auto">
-          {/* HASIL SECTION */}
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-10 mb-8">
             <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">Hasil Kuis Anda</h1>
             
-            {/* SCORE CIRCLE */}
             <div className="flex justify-center mb-8">
               <div className={`w-48 h-48 rounded-full flex items-center justify-center shadow-lg ${
                 percentage === 0
@@ -104,7 +102,6 @@ const ResultPage = () => {
               </div>
             </div>
 
-            {/* STATUS & SCORE */}
             <div className="text-center mb-8">
               <p className={`text-3xl font-bold mb-3 flex items-center justify-center gap-2 ${
                 percentage === 0
@@ -126,7 +123,6 @@ const ResultPage = () => {
                   : '💪 Jangan menyerah! Coba kembali untuk meningkatkan pemahaman Anda.'}
               </p>
 
-              {/* DURATION */}
               <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded inline-block">
                 <p className="text-blue-700 font-semibold">
                   ⏱️ Durasi Mengerjakan: <span className="font-bold text-lg text-blue-600">{durationText}</span>
@@ -135,7 +131,6 @@ const ResultPage = () => {
             </div>
           </div>
 
-          {/* DETAIL JAWABAN SECTION */}
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-10 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <span className="text-2xl">📋</span>
@@ -155,7 +150,6 @@ const ResultPage = () => {
                       : 'bg-red-50 border-red-500 hover:shadow-md'
                   }`} onClick={() => setExpandedQuestion(isExpanded ? null : index)}>
                     
-                    {/* HEADER */}
                     <div className="flex items-start gap-4 mb-3">
                       <div className={`text-2xl flex-shrink-0 ${
                         isCorrect ? 'text-green-600' : 'text-red-600'
@@ -172,7 +166,6 @@ const ResultPage = () => {
                       </span>
                     </div>
 
-                    {/* SIMPLE VIEW */}
                     {!isExpanded && (
                       <div className="ml-10 space-y-1">
                         <p className="text-gray-700">
@@ -194,7 +187,6 @@ const ResultPage = () => {
                       </div>
                     )}
 
-                    {/* EXPANDED VIEW - SEMUA PILIHAN */}
                     {isExpanded && (
                       <div className="ml-10 space-y-3">
                         <p className="text-sm font-semibold text-gray-700 mb-3">
@@ -237,7 +229,6 @@ const ResultPage = () => {
             </div>
           </div>
 
-          {/* ACTION BUTTONS */}
           <div className="flex gap-4 justify-center mb-8">
             <Button 
               onClick={handleRetakeQuiz} 
@@ -257,7 +248,6 @@ const ResultPage = () => {
         </div>
       </div>
 
-      {/* FOOTER - SELALU DI BAWAH */}
       <div className="relative z-10 bg-gray-900 text-gray-400 py-6 text-center">
         <p className="text-sm">© 2024 LearnCheck. Semua hak cipta dilindungi.</p>
       </div>

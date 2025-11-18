@@ -8,7 +8,6 @@ const HomePage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative">
-      {/* Background Pattern */}
       <div 
         className="fixed inset-0 pointer-events-none opacity-15"
         style={{
@@ -20,7 +19,6 @@ const HomePage = () => {
       ></div>
 
       <div className="relative z-10 flex-1">
-        {/* HEADER */}
         <div className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-16 shadow-md">
           <div className="text-center">
             <div className="inline-block bg-white/20 px-4 py-2 rounded-full mb-4">
@@ -31,10 +29,8 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* MAIN CONTENT */}
         <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* LEFT SECTION */}
             <div className="lg:col-span-2">
               <h2 className="text-4xl font-bold text-gray-900 mb-4">
                 Penerapan AI dalam Dunia Nyata
@@ -43,7 +39,6 @@ const HomePage = () => {
                 Pelajari bagaimana AI mengubah cara kita bekerja, belajar, dan hidup setiap hari.
               </p>
 
-              {/* Quiz Card */}
               <div className="bg-white rounded-2xl shadow-lg p-8 border-l-4 border-blue-500">
                 <h3 className="text-2xl font-bold text-gray-900 mb-8">
                   Penerapan AI dalam Dunia Nyata
@@ -76,7 +71,6 @@ const HomePage = () => {
               </div>
             </div>
 
-            {/* RIGHT SECTION */}
             <div>
               <div className="bg-white rounded-2xl shadow-lg p-6 h-fit sticky top-20">
                 <h3 className="text-lg font-bold text-gray-900 mb-5">
@@ -125,7 +119,6 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* FOOTER - SELALU DI BAWAH */}
       <div className="relative z-10 bg-gray-900 text-gray-400 py-6 text-center">
         <p className="text-sm">© 2024 LearnCheck. Semua hak cipta dilindungi.</p>
       </div>

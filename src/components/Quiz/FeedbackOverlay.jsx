@@ -6,7 +6,6 @@ const FeedbackOverlay = ({ isCorrect, message, explanation, onClose }) => {
       <div className="absolute inset-0" onClick={onClose}></div>
       
       <div className="relative z-10 bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden animate-slideUp">
-        {/* Header */}
         <div className={`p-6 text-white font-bold text-xl flex items-center gap-3 ${
           isCorrect 
             ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
@@ -16,7 +15,6 @@ const FeedbackOverlay = ({ isCorrect, message, explanation, onClose }) => {
           {message}
         </div>
 
-        {/* Explanation */}
         {explanation && (
           <div className="p-6" style={{
             borderTop: `4px solid ${isCorrect ? '#10b981' : '#ef4444'}`,
@@ -35,7 +33,6 @@ const FeedbackOverlay = ({ isCorrect, message, explanation, onClose }) => {
           </div>
         )}
 
-        {/* Button */}
         <div className="p-6 bg-white border-t">
           <button
             onClick={onClose}
