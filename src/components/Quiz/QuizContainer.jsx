@@ -8,7 +8,6 @@ import ReviewModal from './ReviewModal';
 import mockQuizzes from '../../data/mockQuizzes';
 import bgPattern from '../../assets/bg-pattern.svg';
 
-// UTILITY: Shuffle array
 const shuffleArray = (array) => {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -18,7 +17,6 @@ const shuffleArray = (array) => {
   return shuffled;
 };
 
-// UTILITY: Ambil 3 soal random
 const selectRandomQuestions = (allQuestions, count = 3) => {
   const shuffled = shuffleArray(allQuestions);
   return shuffled.slice(0, count);
@@ -28,7 +26,6 @@ const QuizContainer = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
-  // GET URL PARAMS
   const tutorialId = searchParams.get('tutorial_id') || '1';
   const userId = searchParams.get('user_id') || 'anonymous';
   
@@ -42,8 +39,8 @@ const QuizContainer = () => {
   const [score, setScore] = useState(0);
   const [startTime, setStartTime] = useState(null);
   const [shuffledQuestions, setShuffledQuestions] = useState([]);
-  const [timeoutQuestions, setTimeoutQuestions] = useState(new Set()); // BARU: Track soal yang timeout
-  const [isCurrentTimeUp, setIsCurrentTimeUp] = useState(false); // BARU: Track timeout soal sekarang
+  const [timeoutQuestions, setTimeoutQuestions] = useState(new Set()); 
+  const [isCurrentTimeUp, setIsCurrentTimeUp] = useState(false); 
   
   const answerSelected = useRef(false);
 
@@ -51,7 +48,6 @@ const QuizContainer = () => {
   const durationPerQuestion = quiz.durationPerQuestion;
   const totalSelectedQuestions = quiz.totalQuestions;
   
-  // Initialize
   useEffect(() => {
     const storageKey = `quiz_${tutorialId}_${userId}`;
     const savedData = localStorage.getItem(storageKey);
@@ -63,9 +59,8 @@ const QuizContainer = () => {
       setCurrentQuestionIndex(currentIndex);
       setStartTime(savedStartTime);
       setTimeRemaining(durationPerQuestion);
-      setTimeoutQuestions(new Set(savedTimeout || [])); // LOAD timeout questions
+      setTimeoutQuestions(new Set(savedTimeout || [])); 
       
-      // Check apakah soal sekarang timeout
       if (savedTimeout && savedTimeout.includes(currentIndex)) {
         setIsCurrentTimeUp(true);
       }
@@ -88,14 +83,13 @@ const QuizContainer = () => {
       setShuffledQuestions(questionsWithShuffledAnswers);
       setStartTime(new Date().toISOString());
       setTimeRemaining(durationPerQuestion);
-      setTimeoutQuestions(new Set()); // INIT empty set
+      setTimeoutQuestions(new Set());
       setIsCurrentTimeUp(false);
       
       console.log('🆕 New quiz session created');
     }
   }, [tutorialId, userId, quiz, durationPerQuestion, totalSelectedQuestions]);
 
-  // Save ke localStorage
   useEffect(() => {
     if (shuffledQuestions.length > 0) {
       const storageKey = `quiz_${tutorialId}_${userId}`;
@@ -104,7 +98,7 @@ const QuizContainer = () => {
         answers,
         currentIndex: currentQuestionIndex,
         startTime,
-        timeoutQuestions: Array.from(timeoutQuestions) // SAVE timeout questions
+        timeoutQuestions: Array.from(timeoutQuestions) 
       };
       localStorage.setItem(storageKey, JSON.stringify(dataToSave));
     }
@@ -137,26 +131,21 @@ const QuizContainer = () => {
     });
   }, [navigate, quiz, totalQuestions, answers, shuffledQuestions, startTime, tutorialId, userId]);
 
-  // Timer
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
-          // Mark soal ini sebagai timeout
           setTimeoutQuestions(prev => new Set([...prev, currentQuestionIndex]));
           setIsCurrentTimeUp(true);
           
-          // Auto pindah ke soal berikutnya
           if (currentQuestionIndex < totalQuestions - 1) {
             setTimeout(() => {
               setCurrentQuestionIndex(currentQuestionIndex + 1);
               setTimeRemaining(durationPerQuestion);
-              // Check apakah soal berikutnya sudah timeout
               setIsCurrentTimeUp(timeoutQuestions.has(currentQuestionIndex + 1));
             }, 1500);
             return 0;
           } else {
-            // Soal terakhir, auto submit
             setTimeout(() => {
               handleSubmitQuiz();
             }, 1500);
@@ -186,7 +175,6 @@ const QuizContainer = () => {
       setShowFeedback(false);
     }
     
-    // Update current timeout status
     setIsCurrentTimeUp(isTimeout);
     
     answerSelected.current = false;
@@ -195,7 +183,6 @@ const QuizContainer = () => {
   const handleAnswerSelect = useCallback((answer) => {
     if (!currentQuestion) return;
     
-    // PREVENT klik jawaban jika soal ini sudah timeout
     if (timeoutQuestions.has(currentQuestionIndex)) {
       console.warn('⏰ Waktu soal ini sudah habis, tidak bisa menjawab');
       return;
@@ -227,9 +214,6 @@ const QuizContainer = () => {
   }, [currentQuestion, currentQuestionIndex, answers, timeoutQuestions]);
 
   const handleNextQuestion = () => {
-    // ALLOW next JIKA:
-    // 1. Sudah ada jawaban (showFeedback), ATAU
-    // 2. Soal sudah timeout (user tidak perlu jawab)
     const canGoNext = showFeedback || timeoutQuestions.has(currentQuestionIndex);
     
     if (currentQuestionIndex < totalQuestions - 1 && canGoNext) {
@@ -251,7 +235,6 @@ const QuizContainer = () => {
 
   const isWarning = timeRemaining < 10;
 
-  // Determine button states
   const canGoBack = currentQuestionIndex > 0;
   const canGoForward = showFeedback || timeoutQuestions.has(currentQuestionIndex); // UPDATED
 
@@ -294,10 +277,9 @@ const QuizContainer = () => {
             correctAnswer={currentQuestion.correctAnswer}
             showFeedback={showFeedback}
             onSelectAnswer={handleAnswerSelect}
-            disabled={timeoutQuestions.has(currentQuestionIndex)} // UPDATED
+            disabled={timeoutQuestions.has(currentQuestionIndex)} 
           />
 
-          {/* FEEDBACK - IN-PAGE */}
           {showFeedback && (
             <div className={`mt-8 p-6 rounded-xl border-l-4 ${
               isCorrect 
@@ -318,7 +300,6 @@ const QuizContainer = () => {
             </div>
           )}
 
-          {/* TIME UP MESSAGE */}
           {isCurrentTimeUp && !showFeedback && (
             <div className="mt-8 p-6 rounded-xl border-l-4 bg-orange-50 border-orange-500">
               <p className="text-orange-700 font-semibold">
@@ -334,7 +315,7 @@ const QuizContainer = () => {
             currentQuestion={currentQuestionIndex + 1}
             totalQuestions={totalQuestions}
             canGoBack={canGoBack}
-            canGoForward={canGoForward} // UPDATED
+            canGoForward={canGoForward}
             selectedAnswer={selectedAnswer}
             showFeedback={showFeedback}
             isTimeUp={isCurrentTimeUp}

@@ -48,16 +48,15 @@ const ResultPage = () => {
           </div>
         </div>
 
-        {/* FOOTER */}
         <div className="relative z-10 bg-gray-900 text-gray-400 py-6 text-center mt-auto">
-          <p className="text-sm">© 2024 LearnCheck. Semua hak cipta dilindungi.</p>
+          <p className="text-sm">© 2025 LearnCheck. Semua hak cipta dilindungi.</p>
         </div>
       </div>
     );
   }
 
   const percentage = Math.round((score / totalQuestions) * 100);
-  const passed = score >= 2; // CHANGED: Cukup 2 dari 3 benar untuk lulus
+  const passed = score >= 2;
 
   const handleRetakeQuiz = () => {
     const params = new URLSearchParams();
@@ -80,11 +79,9 @@ const ResultPage = () => {
       
       <div className="relative z-10 flex-1 p-4 md:p-6 overflow-y-auto">
         <div className="max-w-3xl mx-auto">
-          {/* HASIL SECTION */}
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-10 mb-8">
             <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">Hasil Kuis Anda</h1>
             
-            {/* SCORE CIRCLE */}
             <div className="flex justify-center mb-8">
               <div className={`w-48 h-48 rounded-full flex items-center justify-center shadow-lg ${
                 percentage === 0
@@ -106,7 +103,6 @@ const ResultPage = () => {
               </div>
             </div>
 
-            {/* STATUS & SCORE */}
             <div className="text-center mb-8">
               <div className={`text-3xl font-bold mb-3 flex items-center justify-center gap-3 ${
                 percentage === 0
@@ -142,7 +138,6 @@ const ResultPage = () => {
                 </p>
               </div>
 
-              {/* DURATION */}
               <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded inline-block">
                 <p className="text-blue-700 font-semibold flex items-center gap-2">
                   <ClockIcon className="w-5 h-5" />
@@ -152,7 +147,6 @@ const ResultPage = () => {
             </div>
           </div>
 
-          {/* DETAIL JAWABAN SECTION */}
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-10 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <ClipboardDocumentCheckIcon className="w-6 h-6 text-blue-500" />
@@ -172,7 +166,6 @@ const ResultPage = () => {
                       : 'bg-red-50 border-red-500'
                   }`}>
                     
-                    {/* QUESTION HEADER - CLICKABLE */}
                     <div 
                       className="p-5 cursor-pointer hover:opacity-80 transition-opacity"
                       onClick={() => setExpandedQuestion(isExpanded ? null : index)}
@@ -194,11 +187,9 @@ const ResultPage = () => {
                       </div>
                     </div>
 
-                    {/* EXPANDED CONTENT */}
                     {isExpanded && (
                       <div className="border-t border-current border-opacity-10 p-5 space-y-4">
                         
-                        {/* ALL OPTIONS - LANGSUNG TANPA SUMMARY */}
                         <div>
                           <p className="text-sm font-semibold text-gray-700 mb-3">
                             Semua Pilihan Jawaban:
@@ -238,7 +229,6 @@ const ResultPage = () => {
                           </div>
                         </div>
 
-                        {/* EXPLANATION FEEDBACK BOX */}
                         <div className={`p-4 rounded-lg border-l-4 ${
                           isCorrect
                             ? 'bg-green-100 border-green-500'
@@ -265,7 +255,6 @@ const ResultPage = () => {
             </div>
           </div>
 
-          {/* ACTION BUTTONS */}
           <div className="flex gap-4 justify-center mb-8">
             <Button 
               onClick={handleRetakeQuiz} 
@@ -287,9 +276,8 @@ const ResultPage = () => {
         </div>
       </div>
 
-      {/* FOOTER */}
       <div className="relative z-10 bg-gray-900 text-gray-400 py-6 text-center">
-        <p className="text-sm">© 2024 LearnCheck. Semua hak cipta dilindungi.</p>
+        <p className="text-sm">© 2025 LearnCheck. Semua hak cipta dilindungi.</p>
       </div>
     </div>
   );

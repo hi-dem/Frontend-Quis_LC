@@ -6,7 +6,7 @@ const AnswerOptions = ({
   correctAnswer, 
   showFeedback, 
   onSelectAnswer,
-  disabled = false // BARU: Add disabled prop
+  disabled = false 
 }) => {
   return (
     <div className="mt-8 space-y-3">
@@ -17,8 +17,8 @@ const AnswerOptions = ({
         return (
           <button
             key={idx}
-            onClick={() => !disabled && onSelectAnswer(option)} // UPDATED: Check disabled
-            disabled={disabled || (showFeedback && !isSelected)} // UPDATED: Disable jika waktu habis atau sudah jawab
+            onClick={() => !disabled && onSelectAnswer(option)} 
+            disabled={disabled || (showFeedback && !isSelected)} 
             className={`w-full p-4 rounded-lg border-2 transition-all text-left font-medium ${
               disabled
                 ? 'opacity-50 cursor-not-allowed bg-gray-100 border-gray-300'
