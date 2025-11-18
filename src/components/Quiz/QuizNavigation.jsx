@@ -10,7 +10,8 @@ const QuizNavigation = ({
   canGoBack,
   canGoForward,
   selectedAnswer,
-  showFeedback
+  showFeedback,
+  isTimeUp = false
 }) => {
   return (
     <div className="mt-10 flex gap-4 justify-between items-center">
