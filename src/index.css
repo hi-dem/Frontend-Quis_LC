@@ -2,62 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+/* ==============================
+   CSS VARIABLES (easy theming)
+   ============================== */
+:root {
+  --color-bg-body: #f0f4ff;          /* Body background (ganti kalau terlalu biru) */
+  --color-text-base: #1f2937;
+  --color-bottom-bar-bg: #06111C;    /* Warna bottom nav (ganti sesuai Figma) */
+  --color-bottom-bar-border: #142233;
+  --color-bottom-bar-text: #c9d1d9;
+  --color-scrollbar-track: #f0f3f5;
+  --color-scrollbar-thumb: #c5ced6;
+  --color-scrollbar-thumb-hover: #aab5bf;
+}
+
+/* ==============================
+   RESET & GLOBAL
+   ============================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html {
+html, body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
   scroll-behavior: smooth;
-}
-
-body {
   font-family: 'Inter', sans-serif;
-  background-color: #f0f4ff;
-  color: #1f2937;
+  background: var(--color-bg-body);
+  color: var(--color-text-base);
 }
 
+/* Pastikan hanya body yang scroll (hindari nested scroll di container utama).
+   Komponen layout jangan gunakan overflow-y-auto untuk wrapper utama kecuali sidebar. */
+body {
+  overscroll-behavior-y: none;
+}
+
+/* ==============================
+   SCROLLBAR (WebKit)
+   ============================== */
+body::-webkit-scrollbar {
+  width: 10px;
+}
+body::-webkit-scrollbar-track {
+  background: var(--color-scrollbar-track);
+}
+body::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar-thumb);
+  border-radius: 5px;
+  border: 2px solid var(--color-scrollbar-track);
+}
+body::-webkit-scrollbar-thumb:hover {
+  background: var(--color-scrollbar-thumb-hover);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar-thumb) var(--color-scrollbar-track);
+}
+
+/* ==============================
+   ANIMATIONS
+   ============================== */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes bounce {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }
 }
-
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-5px); }
   75% { transform: translateX(5px); }
 }
-
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
@@ -69,3 +103,81 @@ body {
 .animate-bounce { animation: bounce 0.6s ease-in-out; }
 .animate-shake { animation: shake 0.4s ease-in-out; }
 .animate-pulse { animation: pulse 2s ease-in-out infinite; }
+
+/* ==============================
+   CUSTOM COMPONENT UTILITIES
+   ============================== */
+@layer components {
+  /* Bottom navigation bar gaya Figma */
+  .bottom-bar {
+    @apply fixed bottom-0 left-0 right-0 z-40 flex items-center;
+    height: 56px;
+    background: var(--color-bottom-bar-bg);
+    border-top: 1px solid var(--color-bottom-bar-border);
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .bottom-bar-inner {
+    @apply w-full max-w-7xl mx-auto flex justify-between items-center;
+  }
+
+  .bottom-bar-btn {
+    @apply group flex items-center gap-1 text-sm font-medium transition-colors;
+    color: var(--color-bottom-bar-text);
+  }
+  .bottom-bar-btn:hover {
+    color: #3b82f6; /* Tailwind blue-500 hover */
+  }
+  .bottom-bar-btn span:nth-child(1),
+  .bottom-bar-btn span:last-child {
+    @apply transition-transform;
+  }
+  .bottom-bar-btn:hover span.arrow-left {
+    transform: translateX(-4px);
+  }
+  .bottom-bar-btn:hover span.arrow-right {
+    transform: translateX(4px);
+  }
+
+  /* Sidebar toggle buttons */
+  .sidebar-toggle {
+    @apply w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-lg transition;
+  }
+
+  /* Smooth panel appearance */
+  .panel {
+    @apply bg-white rounded-xl shadow;
+    animation: fadeIn 0.25s ease;
+  }
+}
+
+/* ==============================
+   UTILITY HELPERS
+   ============================== */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE 10+ */
+  scrollbar-width: none;     /* Firefox */
+}
+
+/* Padding bottom agar konten tidak tertutup bottom bar */
+.has-bottom-bar {
+  padding-bottom: 80px; /* > 56px untuk aman */
+}
+
+/* ==============================
+   OPTIONAL THEME SWITCH (if needed)
+   ============================== */
+[data-theme='dark'] {
+  --color-bg-body: #0d1117;
+  --color-text-base: #e6edf3;
+  --color-bottom-bar-bg: #010409;
+  --color-bottom-bar-border: #1f2328;
+  --color-bottom-bar-text: #8b949e;
+  --color-scrollbar-track: #161b22;
+  --color-scrollbar-thumb: #30363d;
+  --color-scrollbar-thumb-hover: #4a545d;
+}
