@@ -1,12 +1,11 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
 import { LearningProvider } from './context/LearningContext';
 import { QuizProvider } from './context/QuizContext';
 import LayoutWrapper from './components/Layout/LayoutWrapper';
 
 // Pages
-import Home from './pages/Home';
 import Learning from './pages/Learning';
 import Quiz from './pages/Quiz';
 import Feedback from './pages/Feedback';
@@ -19,27 +18,14 @@ function App() {
       <LearningProvider>
         <QuizProvider>
           <Routes>
-            {/* Home */}
-            <Route
-              path="/"
-              element={
-                <LayoutWrapper showBottomNav={false}>
-                  <Home />
-                </LayoutWrapper>
-              }
-            />
+            {/* Redirect root to material */}
+            <Route path="/" element={<Navigate to="/material" replace />} />
 
-            {/* Material / Learning */}
+            {/* Material / Learning - LANDING PAGE */}
             <Route
               path="/material"
               element={
-                <LayoutWrapper
-                  showBottomNav={true}
-                  prevLabel="Beranda"
-                  prevPath="/"
-                  nextLabel="Quiz Submodul #1"
-                  nextPath="/quiz-intro"
-                >
+                <LayoutWrapper showBottomNav={false}>
                   <Learning />
                 </LayoutWrapper>
               }
@@ -71,17 +57,13 @@ function App() {
               }
             />
 
-            {/* Quiz Running */}
+            {/* Quiz Running - NO LAYOUT WRAPPER */}
             <Route
               path="/quiz"
-              element={
-                <LayoutWrapper showBottomNav={false}>
-                  <Quiz />
-                </LayoutWrapper>
-              }
+              element={<Quiz />}
             />
 
-            {/* Feedback / Results - TANPA LayoutWrapper */}
+            {/* Feedback / Results - FULL PAGE */}
             <Route
               path="/results"
               element={<Feedback />}

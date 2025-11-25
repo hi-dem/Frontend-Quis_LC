@@ -12,7 +12,7 @@ import bgPattern from '../../assets/bg-pattern.svg';
 
 const shuffleQuestions = (questions, count = 3) => {
   const shuffled = shuffleArray(questions);
-  return shuffled.slice(0, count). map(q => {
+  return shuffled.slice(0, count).map(q => {
     const originalCorrectAnswer = q.correctAnswer;
     const shuffledAnswers = shuffleArray(q.answers);
     
@@ -67,20 +67,20 @@ const QuizContainer = () => {
           setIsCurrentTimeUp(true);
         }
 
-        console.log('✅ Loaded quiz from localStorage:', storageKey);
+        console.log('Loaded quiz from localStorage:', storageKey);
       } catch (error) {
-        console.error('❌ Error loading from localStorage:', error);
+        console.error('Error loading from localStorage:', error);
       }
     } else {
       const selectedQuestions = shuffleQuestions(quiz.questions, totalSelectedQuestions);
       setShuffledQuestions(selectedQuestions);
-      setStartTime(new Date(). toISOString());
+      setStartTime(new Date().toISOString());
       setTimeRemaining(durationPerQuestion);
       setTimeoutQuestions(new Set());
       setIsCurrentTimeUp(false);
 
-      console.log('🆕 New quiz session created');
-      console.log('📚 Shuffled questions with answers:', selectedQuestions);
+      console.log('New quiz session created');
+      console.log('Shuffled questions:', selectedQuestions);
     }
   }, [tutorialId, userId, quiz, durationPerQuestion, totalSelectedQuestions]);
 
@@ -98,7 +98,7 @@ const QuizContainer = () => {
       try {
         localStorage.setItem(storageKey, JSON.stringify(dataToSave));
       } catch (error) {
-        console.error('❌ Error saving to localStorage:', error);
+        console.error('Error saving to localStorage:', error);
       }
     }
   }, [answers, currentQuestionIndex, shuffledQuestions, tutorialId, userId, startTime, timeoutQuestions]);
@@ -160,10 +160,10 @@ const QuizContainer = () => {
   }, [currentQuestionIndex, answers, currentQuestion, timeoutQuestions]);
 
   const handleAnswerSelect = useCallback((answer) => {
-    if (!currentQuestion) return;
+    if (! currentQuestion) return;
 
     if (timeoutQuestions.has(currentQuestionIndex)) {
-      console.warn('⏰ Waktu soal ini sudah habis');
+      console.warn('Waktu soal ini sudah habis');
       return;
     }
 
@@ -176,9 +176,9 @@ const QuizContainer = () => {
     setShowFeedback(true);
     const correct = answer === currentQuestion.correctAnswer;
 
-    console.log(`📝 Question ${currentQuestionIndex}: Selected "${answer}"`);
-    console.log(`   Correct answer: "${currentQuestion.correctAnswer}"`);
-    console.log(`   Is correct: ${correct}`);
+    console.log(`Question ${currentQuestionIndex}: Selected "${answer}"`);
+    console.log(`Correct answer: "${currentQuestion.correctAnswer}"`);
+    console.log(`Is correct: ${correct}`);
 
     setSelectedAnswer(answer);
     setIsCorrect(correct);
@@ -206,12 +206,11 @@ const QuizContainer = () => {
   };
 
   const handleConfirmSubmit = useCallback(() => {
-    console.log('🔄 Starting submission.. .');
-    console.log('📦 Current answers state:', answers);
-    console.log('📦 Shuffled questions:', shuffledQuestions);
+    console.log('Starting submission');
+    console.log('Current answers:', answers);
+    console.log('Shuffled questions count:', shuffledQuestions.length);
 
     let correctCount = 0;
-    const answeredQuestions = [];
 
     Object.keys(answers).forEach((idx) => {
       const questionIndex = parseInt(idx, 10);
@@ -220,44 +219,33 @@ const QuizContainer = () => {
 
       if (question && userAnswer) {
         const isCorrectAnswer = userAnswer === question.correctAnswer;
-        answeredQuestions.push({
-          questionIndex,
-          userAnswer,
-          correctAnswer: question.correctAnswer,
-          isCorrect: isCorrectAnswer,
-          question: question.question
-        });
-        
         if (isCorrectAnswer) {
           correctCount++;
         }
-
         console.log(`Q${questionIndex + 1}: User="${userAnswer}" | Correct="${question.correctAnswer}" | Match=${isCorrectAnswer}`);
       }
     });
 
-    console. log('✅ Final score:', correctCount, 'out of', totalQuestions);
-    console.log('📋 Answered questions detail:', answeredQuestions);
+    console. log('Final score:', correctCount, 'out of', totalQuestions);
 
     const storageKey = `quiz_${tutorialId}_${userId}`;
     localStorage.removeItem(storageKey);
-    console.log('🗑️ Cleared localStorage:', storageKey);
 
     const navigationState = {
       score: correctCount,
-      totalQuestions,
-      answers,
-      quiz: { 
-        ...quiz, 
+      totalQuestions: totalQuestions,
+      answers: answers,
+      quiz: {
+        ... quiz,
         questions: shuffledQuestions,
-        totalQuestions
+        totalQuestions: totalQuestions
       },
-      startTime,
-      tutorialId,
-      userId
+      startTime: startTime,
+      tutorialId: tutorialId,
+      userId: userId
     };
 
-    console.log('🚀 Navigating to /results with state:', navigationState);
+    console.log('Navigating to /results with score:', correctCount);
 
     setShowReviewModal(false);
 
@@ -270,7 +258,7 @@ const QuizContainer = () => {
   const canGoBack = currentQuestionIndex > 0;
   const canGoForward = showFeedback || timeoutQuestions.has(currentQuestionIndex);
 
-  if (!currentQuestion || shuffledQuestions.length === 0) {
+  if (! currentQuestion || shuffledQuestions.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-lg text-gray-600">Loading...</p>
@@ -324,10 +312,10 @@ const QuizContainer = () => {
             />
           )}
 
-          {isCurrentTimeUp && !showFeedback && (
+          {isCurrentTimeUp && ! showFeedback && (
             <div className="mt-8 p-6 rounded-xl border-l-4 bg-orange-50 border-orange-500">
               <p className="text-orange-700 font-semibold">
-                ⏰ Waktu habis untuk soal ini. Anda dapat melanjutkan ke soal berikutnya.
+                Waktu habis untuk soal ini.  Anda dapat melanjutkan ke soal berikutnya.
               </p>
             </div>
           )}
@@ -336,7 +324,7 @@ const QuizContainer = () => {
             onPrevious={handlePreviousQuestion}
             onNext={handleNextQuestion}
             onSubmit={() => {
-              console.log('📝 Opening review modal.. .');
+              console.log('Opening review modal');
               setShowReviewModal(true);
             }}
             currentQuestion={currentQuestionIndex + 1}
@@ -352,11 +340,11 @@ const QuizContainer = () => {
         <ReviewModal
           isOpen={showReviewModal}
           onClose={() => {
-            console.log('❌ Closing review modal');
+            console.log('Closing review modal');
             setShowReviewModal(false);
           }}
           onConfirm={() => {
-            console.log('✔️ Confirmed submission');
+            console.log('Confirmed submission');
             handleConfirmSubmit();
           }}
           answers={answers}
