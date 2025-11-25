@@ -6,14 +6,45 @@ import AnswerReview from './AnswerReview';
 import Button from '../Common/Button';
 import bgPattern from '../../assets/bg-pattern.svg';
 
+// Mock data untuk testing
+const MOCK_STATE = {
+  score: 3,
+  totalQuestions: 3,
+  answers: { 0: 'Mengaktifkan perangkat agar mulai memproses perintah pengguna', 1: '31%', 2: 'Dari 20% menjadi 50%' },
+  quiz: {
+    questions: [
+      { 
+        id: 1, 
+        question: 'Q1', 
+        correctAnswer: 'Mengaktifkan perangkat agar mulai memproses perintah pengguna',
+        options: ['Option 1', 'Option 2', 'Option 3', 'Option 4']
+      },
+      { 
+        id: 2, 
+        question: 'Q2', 
+        correctAnswer: '31%',
+        options: ['Option 1', 'Option 2', 'Option 3', 'Option 4']
+      },
+      { 
+        id: 3, 
+        question: 'Q3', 
+        correctAnswer: 'Dari 20% menjadi 50%',
+        options: ['Option 1', 'Option 2', 'Option 3', 'Option 4']
+      }
+    ]
+  },
+  startTime: new Date(Date.now() - 30000).toISOString()
+};
+
 const FeedbackPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
+  
   const [durationText, setDurationText] = useState('0m 0s');
   const [expandedQuestion, setExpandedQuestion] = useState(null);
 
-  const state = location.state || {};
+  // Use mock data jika location. state kosong (untuk testing /results-test)
+  const state = location.state || (window.location.pathname === '/results-test' ? MOCK_STATE : {});
   const { score = 0, totalQuestions = 0, answers = {}, quiz = null, startTime = null } = state;
 
   console.log('FeedbackPage location state:', state);
@@ -36,7 +67,7 @@ const FeedbackPage = () => {
     }
   }, [startTime, score]);
 
-  const hasQuizData = quiz && Array.isArray(quiz. questions) && quiz.questions.length > 0;
+  const hasQuizData = quiz && Array.isArray(quiz.questions) && quiz.questions.length > 0;
   const isValidScore = typeof score === 'number' && score >= 0;
 
   console.log('Validation check:', {

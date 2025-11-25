@@ -1,23 +1,28 @@
 import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import { useScrollProgress } from '../../hooks/useScrollProgress';
-import { useLearning } from '../../hooks/useLearning';
 import ContentReader from './ContentReader';
 import ProgressBar from './ProgressBar';
 import ScrollIndicator from './ScrollIndicator';
+import mockTopics from '../../data/mockTopics';
 
-const SubmoduleContent = () => {
-  const location = useLocation();
-  const { updateSubmoduleProgress } = useLearning();
-  const { progress, isCompleted, containerRef } = useScrollProgress(95);
+const SubmoduleContent = ({ onCompletion }) => {
+  const { progress, isCompleted, containerRef, isScrollable } = useScrollProgress(80);
 
-  const { submodule } = location.state || {};
+  // Get first submodule dari mockTopics
+  const submodule = mockTopics[0]?.modules?.[0]?. submodules?.[0] || null;
 
   useEffect(() => {
-    if (submodule) {
-      updateSubmoduleProgress(submodule. id, progress);
+    console.log('SubmoduleContent loaded:', { progress, isCompleted, isScrollable });
+    
+    // Dispatch completion event
+    window.dispatchEvent(new CustomEvent('material-completed', {
+      detail: { isCompleted }
+    }));
+    
+    if (onCompletion) {
+      onCompletion(isCompleted);
     }
-  }, [progress, submodule, updateSubmoduleProgress]);
+  }, [isCompleted, onCompletion]);
 
   if (!submodule) {
     return (
@@ -37,6 +42,13 @@ const SubmoduleContent = () => {
       {/* Progress Bar */}
       <ProgressBar progress={progress} isCompleted={isCompleted} />
 
+      {/* Completion Feedback */}
+      {! isCompleted && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-700">
+          📚 Silakan baca dan pahami materi terlebih dahulu sebelum melanjutkan ke quiz.
+        </div>
+      )}
+
       {/* Content */}
       <ContentReader 
         containerRef={containerRef}
@@ -45,7 +57,9 @@ const SubmoduleContent = () => {
       />
 
       {/* Scroll Indicator */}
-      <ScrollIndicator progress={progress} />
+      {isScrollable && (
+        <ScrollIndicator progress={progress} isScrollable={isScrollable} />
+      )}
     </div>
   );
 };

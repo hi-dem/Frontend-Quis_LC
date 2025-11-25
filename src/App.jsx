@@ -4,6 +4,7 @@ import './index.css';
 import { LearningProvider } from './context/LearningContext';
 import { QuizProvider } from './context/QuizContext';
 import LayoutWrapper from './components/Layout/LayoutWrapper';
+import mockTopics from './data/mockTopics';
 
 // Pages
 import Learning from './pages/Learning';
@@ -13,19 +14,35 @@ import QuizIntroPage from './pages/QuizIntroPage';
 import LoadingPage from './pages/LoadingPage';
 
 function App() {
+  const quiz = mockTopics[0]?.modules?.[0]?.submodules?.[0]?.quiz;
+
   return (
     <Router>
       <LearningProvider>
         <QuizProvider>
           <Routes>
+            {/* Test: Results page dengan mock data */}
+            <Route 
+              path="/results-test" 
+              element={<Feedback />}
+            />
+
             {/* Redirect root to material */}
             <Route path="/" element={<Navigate to="/material" replace />} />
 
-            {/* Material / Learning - LANDING PAGE */}
+            {/* Material / Learning */}
             <Route
               path="/material"
               element={
-                <LayoutWrapper showBottomNav={false}>
+                <LayoutWrapper 
+                  showBottomNav={true}
+                  prevLabel="Beranda"
+                  prevPath="/"
+                  nextLabel="Quiz Submodul"
+                  nextPath="/quiz-intro"
+                  nextState={{ quiz }}
+                  requiresCompletion={true}
+                >
                   <Learning />
                 </LayoutWrapper>
               }
@@ -41,6 +58,7 @@ function App() {
                   prevPath="/material"
                   nextLabel="Mulai Kuis"
                   nextPath="/loading"
+                  nextState={{ quiz }}
                 >
                   <QuizIntroPage />
                 </LayoutWrapper>
@@ -57,13 +75,17 @@ function App() {
               }
             />
 
-            {/* Quiz Running - NO LAYOUT WRAPPER */}
+            {/* Quiz Running */}
             <Route
               path="/quiz"
-              element={<Quiz />}
+              element={
+                <LayoutWrapper showBottomNav={false}>
+                  <Quiz />
+                </LayoutWrapper>
+              }
             />
 
-            {/* Feedback / Results - FULL PAGE */}
+            {/* Results */}
             <Route
               path="/results"
               element={<Feedback />}

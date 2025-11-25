@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 import Header from '../Common/Header';
 import Sidebar from './Sidebar';
@@ -12,19 +13,46 @@ const LayoutWrapper = ({
   nextLabel = '',
   prevPath = '',
   nextPath = '',
+  prevState = null,
+  nextState = null,
+  requiresCompletion = false,
   onPrevClick,
   onNextClick
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Listen untuk completion event dari SubmoduleContent
+    const handleCompletion = (e) => {
+      setIsCompleted(e.detail.isCompleted);
+      console.log('Material completion event:', e.detail. isCompleted);
+    };
+    
+    window.addEventListener('material-completed', handleCompletion);
+    return () => window.removeEventListener('material-completed', handleCompletion);
+  }, []);
 
   const handlePrev = () => {
-    if (prevPath) window.location.href = prevPath;
-    else if (onPrevClick) onPrevClick();
+    if (prevPath) {
+      navigate(prevPath, prevState ?  { state: prevState } : {});
+    } else if (onPrevClick) {
+      onPrevClick();
+    }
   };
 
   const handleNext = () => {
-    if (nextPath) window. location.href = nextPath;
-    else if (onNextClick) onNextClick();
+    if (requiresCompletion && !isCompleted) {
+      console.log('⚠️ Selesaikan materi terlebih dahulu');
+      return;
+    }
+    
+    if (nextPath) {
+      navigate(nextPath, nextState ? { state: nextState } : {});
+    } else if (onNextClick) {
+      onNextClick();
+    }
   };
 
   return (
@@ -47,7 +75,9 @@ const LayoutWrapper = ({
       <div className="flex flex-1 w-full">
         {/* Main Content */}
         <main className="flex-1 px-6 md:px-8 lg:px-10 pt-8 pb-24 max-w-5xl mx-auto">
-          {children}
+          {React.cloneElement(children, {
+            onCompletion: (completed) => setIsCompleted(completed)
+          })}
         </main>
 
         {/* Sidebar - Desktop Only */}
@@ -89,6 +119,7 @@ const LayoutWrapper = ({
           nextLabel={nextLabel}
           onPrev={handlePrev}
           onNext={handleNext}
+          nextDisabled={requiresCompletion && !isCompleted}
         />
       )}
     </div>

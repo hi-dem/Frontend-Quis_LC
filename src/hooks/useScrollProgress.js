@@ -1,23 +1,34 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 
-export const useScrollProgress = (threshold = 90) => {
+export const useScrollProgress = (threshold = 95) => {
+  const containerRef = useRef(null);
   const [progress, setProgress] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const containerRef = useRef(null);
+  const [isScrollable, setIsScrollable] = useState(false);
 
   const handleScroll = useCallback(() => {
-    if (!containerRef.current) return;
+    if (! containerRef.current) return;
 
-    const element = containerRef.current;
-    const scrollHeight = element.scrollHeight - element.clientHeight;
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
     
-    if (scrollHeight === 0) return;
-    
-    const scrolled = (element.scrollTop / scrollHeight) * 100;
+    // Check if content is scrollable
+    const contentHeight = scrollHeight - clientHeight;
+    const canScroll = contentHeight > 50; // Minimal 50px scroll area
 
-    setProgress(Math.min(100, scrolled));
+    setIsScrollable(canScroll);
 
-    if (scrolled >= threshold) {
+    if (canScroll) {
+      // Calculate progress based on scroll
+      const newProgress = Math.min((scrollTop / contentHeight) * 100, 100);
+      setProgress(newProgress);
+      
+      // Mark as completed if threshold reached
+      if (newProgress >= threshold) {
+        setIsCompleted(true);
+      }
+    } else {
+      // Content tidak scrollable = auto complete
+      setProgress(100);
       setIsCompleted(true);
     }
   }, [threshold]);
@@ -26,11 +37,22 @@ export const useScrollProgress = (threshold = 90) => {
     const container = containerRef.current;
     if (!container) return;
 
+    // Check initial state
+    handleScroll();
+
     container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, [handleScroll]);
 
-  return { progress, isCompleted, containerRef };
+  return {
+    progress,
+    isCompleted,
+    containerRef,
+    isScrollable
+  };
 };
-
-export default useScrollProgress;
