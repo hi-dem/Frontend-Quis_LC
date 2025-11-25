@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ClipboardDocumentCheckIcon, ClockIcon } from '@heroicons/react/24/solid';
-import Button from '../Common/Button';
+import Button from '../components/Common/Button';
 
-const QuizIntroContent = () => {
+const QuizIntroPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { quiz } = location.state || {};
@@ -70,7 +70,7 @@ const QuizIntroContent = () => {
               <ClockIcon className="w-6 h-6 text-blue-600" />
               <div className="text-center">
                 <p className="text-gray-600 font-medium">Durasi</p>
-                <p className="text-2xl font-bold text-gray-900">{quiz.durationPerQuestion} detik/soal</p>
+                <p className="text-2xl font-bold text-gray-900">{quiz. durationPerQuestion} detik/soal</p>
               </div>
             </div>
           </div>
@@ -89,4 +89,4 @@ const QuizIntroContent = () => {
   );
 };
 
-export default QuizIntroContent;
+export default QuizIntroPage;

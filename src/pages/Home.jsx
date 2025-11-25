@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import QuizCard from '../Quiz/QuizCard';
+import QuizCard from '../components/Quiz/QuizCard';
 
-const HomeContent = () => {
+const Home = () => {
   const [selectedModule, setSelectedModule] = useState({
     title: 'Penerangan AI dalam Dunia Nyata',
     totalQuestions: 3,
@@ -24,7 +24,7 @@ const HomeContent = () => {
       {/* Main Content */}
       <div>
         <h2 className="text-4xl font-bold text-gray-900 mb-4">
-          {selectedModule?.title || 'Penerangan AI dalam Dunia Nyata'}
+          {selectedModule?. title || 'Penerangan AI dalam Dunia Nyata'}
         </h2>
         <p className="text-gray-700 text-base leading-relaxed mb-8">
           Pelajari bagaimana AI mengubah cara kita bekerja, belajar, dan hidup setiap hari.
@@ -37,4 +37,4 @@ const HomeContent = () => {
   );
 };
 
-export default HomeContent;
+export default Home;

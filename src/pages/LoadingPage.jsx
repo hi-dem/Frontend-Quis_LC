@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const LoadingContent = () => {
+const LoadingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { quiz } = location.state || {};
 
   useEffect(() => {
-    // Simulasi loading - generate soal dari AI (nanti)
     const timer = setTimeout(() => {
       navigate('/quiz', { state: { quiz } });
     }, 2000);
@@ -39,7 +38,7 @@ const LoadingContent = () => {
         <div className="space-y-4">
           <h2 className="text-4xl font-bold">Tunggu sebentar!</h2>
           <p className="text-xl text-blue-100">
-            Kami sedang mempersiapkan soal untuk Anda...
+            Kami sedang mempersiapkan soal untuk Anda... 
           </p>
         </div>
 
@@ -47,7 +46,7 @@ const LoadingContent = () => {
         <div className="flex justify-center gap-2">
           <div className="w-3 h-3 rounded-full bg-white animate-bounce"></div>
           <div className="w-3 h-3 rounded-full bg-white animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-          <div className="w-3 h-3 rounded-full bg-white animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+          <div className="w-3 h-3 rounded-full bg-white animate-bounce" style={{ animationDelay: '0. 4s' }}></div>
         </div>
 
         {/* Progress Text */}
@@ -59,4 +58,4 @@ const LoadingContent = () => {
   );
 };
 
-export default LoadingContent;
+export default LoadingPage;

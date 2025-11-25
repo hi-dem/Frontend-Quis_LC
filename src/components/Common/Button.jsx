@@ -8,8 +8,6 @@ const Button = ({
   className = '',
   ...props 
 }) => {
-  console.log('Button rendered - disabled:', disabled, 'variant:', variant, 'children:', children); 
-  
   const baseStyles = 'font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 px-6 py-2';
   
   const variants = {

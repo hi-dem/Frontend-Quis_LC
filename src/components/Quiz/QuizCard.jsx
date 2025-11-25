@@ -17,7 +17,7 @@ const QuizCard = ({ quiz }) => {
       <h3 className="text-2xl font-bold text-gray-900 mb-8">
         {quiz.title}
       </h3>
-      
+
       <div className="space-y-4 mb-8">
         <div className="flex items-center gap-4">
           <ClipboardDocumentCheckIcon className="w-6 h-6 text-blue-500 flex-shrink-0" />
@@ -31,12 +31,12 @@ const QuizCard = ({ quiz }) => {
           <ClockIcon className="w-6 h-6 text-blue-500 flex-shrink-0" />
           <div>
             <p className="text-gray-600 font-medium">Durasi:</p>
-            <p className="text-gray-900 font-bold text-lg">{quiz.durationPerQuestion} detik/soal</p>
+            <p className="text-gray-900 font-bold text-lg">{quiz. durationPerQuestion} detik/soal</p>
           </div>
         </div>
       </div>
 
-      <Button 
+      <Button
         onClick={handleStartQuiz}
         variant="primary"
         className="w-full py-3 text-base font-bold text-center"

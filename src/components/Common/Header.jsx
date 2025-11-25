@@ -19,8 +19,8 @@ const Header = () => {
   ];
 
   const handleThemeSelect = (theme) => {
-    document.documentElement.setAttribute('data-theme', theme.value);
-    localStorage.setItem('theme', theme.value);
+    document. documentElement.setAttribute('data-theme', theme. value);
+    localStorage.setItem('theme', theme. value);
     setShowThemeMenu(false);
   };
 
@@ -38,7 +38,7 @@ const Header = () => {
         </div>
         <div className="relative">
           <button
-            onClick={() => setShowThemeMenu(!showThemeMenu)}
+            onClick={() => setShowThemeMenu(! showThemeMenu)}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
           >
             Pilih Tema

@@ -1,62 +1,56 @@
 import React from 'react';
 import Button from '../Common/Button';
 
-const ReviewModal = ({ isOpen, onClose, onConfirm, answers, totalQuestions }) => {
+const ReviewModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  answers,
+  totalQuestions
+}) => {
   if (!isOpen) return null;
 
   const answeredCount = Object.keys(answers).length;
-  const allAnswered = answeredCount === totalQuestions;
+  const unansweredCount = totalQuestions - answeredCount;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 animate-fadeIn">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 animate-slideUp">
-        <div className="flex justify-between items-start mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <span className="text-2xl">📋</span>
-            Review Jawaban
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl font-bold w-8 h-8 flex items-center justify-center"
-          >
-            ✕
-          </button>
-        </div>
-
-        <div className="mb-6">
-          <p className="text-gray-700 text-base mb-4">
-            Anda telah menjawab <span className="font-bold text-blue-600">{answeredCount}</span> dari <span className="font-bold text-gray-900">{totalQuestions}</span> pertanyaan.
-          </p>
-
-          {allAnswered ? (
-            <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded">
-              <p className="text-green-700 font-semibold flex items-center gap-2">
-                <span>✓</span> Semua pertanyaan sudah dijawab!
-              </p>
-            </div>
-          ) : (
-            <div className="bg-orange-50 border-l-4 border-orange-500 p-4 rounded">
-              <p className="text-orange-700 font-semibold flex items-center gap-2">
-                <span>⚠️</span> Ada {totalQuestions - answeredCount} pertanyaan yang belum dijawab.
-              </p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Review Jawaban</h2>
+        
+        <div className="bg-blue-50 rounded-lg p-4 mb-6 space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-700">Soal terjawab:</span>
+            <span className="font-semibold text-green-600">{answeredCount}/{totalQuestions}</span>
+          </div>
+          {unansweredCount > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-700">Soal belum dijawab:</span>
+              <span className="font-semibold text-red-600">{unansweredCount}</span>
             </div>
           )}
         </div>
 
+        {unansweredCount > 0 && (
+          <p className="text-sm text-orange-700 bg-orange-50 p-3 rounded mb-6">
+            ⚠️ Ada {unansweredCount} soal yang belum dijawab. Lanjutkan?
+          </p>
+        )}
+
         <div className="flex gap-3">
-          <Button 
+          <Button
             onClick={onClose}
-            variant="secondary"
+            variant="outline"
             className="flex-1"
           >
             Kembali
           </Button>
-          <Button 
+          <Button
             onClick={onConfirm}
-            variant="success"
+            variant="primary"
             className="flex-1"
           >
-            Konfirmasi & Selesai
+            Selesai
           </Button>
         </div>
       </div>

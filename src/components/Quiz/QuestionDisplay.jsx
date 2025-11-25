@@ -1,17 +1,21 @@
 import React from 'react';
-import { QuestionMarkCircleIcon } from '@heroicons/react/24/solid';
 
-const QuestionDisplay = ({ question, questionNumber, totalQuestions }) => {
+const QuestionDisplay = ({ 
+  question, 
+  questionNumber, 
+  totalQuestions 
+}) => {
   return (
     <div className="mb-8">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="bg-blue-100 text-blue-600 px-4 py-2 rounded-full text-sm font-semibold">
-          Pertanyaan {questionNumber}/{totalQuestions}
-        </div>
-        <QuestionMarkCircleIcon className="w-6 h-6 text-blue-500" />
+      <div className="flex justify-between items-center mb-4">
+        <span className="text-xs uppercase tracking-wider text-blue-600 font-semibold">
+          Soal {questionNumber} / {totalQuestions}
+        </span>
+        <span className="text-xs text-gray-500">
+          {Math.round((questionNumber / totalQuestions) * 100)}% Selesai
+        </span>
       </div>
-      
-      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-relaxed">
+      <h2 className="text-xl font-bold text-gray-900 leading-snug">
         {question}
       </h2>
     </div>

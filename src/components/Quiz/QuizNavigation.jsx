@@ -1,53 +1,58 @@
 import React from 'react';
 import Button from '../Common/Button';
 
-const QuizNavigation = ({ 
-  onPrevious, 
-  onNext, 
+const QuizNavigation = ({
+  onPrevious,
+  onNext,
   onSubmit,
-  currentQuestion, 
+  currentQuestion,
   totalQuestions,
   canGoBack,
   canGoForward,
   selectedAnswer,
   showFeedback,
-  isTimeUp = false
+  isTimeUp
 }) => {
-  return (
-    <div className="mt-10 flex gap-4 justify-between items-center">
-      <Button
-        onClick={onPrevious}
-        variant="secondary"
-        disabled={!canGoBack}
-        className={`px-6 py-3 ${!canGoBack ? 'opacity-50 cursor-not-allowed' : ''}`}
-      >
-        · Sebelumnya
-      </Button>
+  const isLastQuestion = currentQuestion === totalQuestions;
+  const canSubmit = isLastQuestion && (showFeedback || isTimeUp);
 
-      <div className="text-center">
-        <p className="text-gray-600 font-semibold">
-          Soal {currentQuestion} dari {totalQuestions}
-        </p>
+  return (
+    <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+      <div className="flex gap-2">
+        <button
+          onClick={onPrevious}
+          disabled={!canGoBack}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+            !canGoBack
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+          }`}
+        >
+          ‹ Sebelumnya
+        </button>
+        
+        {!isLastQuestion && (
+          <button
+            onClick={onNext}
+            disabled={!canGoForward}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+              !canGoForward
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+            }`}
+          >
+            Berikutnya ›
+          </button>
+        )}
       </div>
 
-      {currentQuestion === totalQuestions ? (
-        <Button
+      {canSubmit && (
+        <button
           onClick={onSubmit}
-          variant="success"
-          disabled={!showFeedback}
-          className={`px-6 py-3 ${!showFeedback ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className="px-6 py-2 rounded-lg text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition"
         >
-          Selesai & Review
-        </Button>
-      ) : (
-        <Button
-          onClick={onNext}
-          variant="primary"
-          disabled={!canGoForward}
-          className={`px-6 py-3 ${!canGoForward ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          Selanjutnya ·
-        </Button>
+          Selesai & Lihat Hasil
+        </button>
       )}
     </div>
   );
