@@ -1,104 +1,89 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircleIcon, XCircleIcon, ClockIcon, HomeIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
-import ScoreDisplay from './ScoreDisplay';
-import AnswerReview from './AnswerReview';
-import Button from '../Common/Button';
-import bgPattern from '../../assets/bg-pattern.svg';
+import React from 'react';
+import { CheckCircleIcon, XCircleIcon, ClockIcon } from '@heroicons/react/24/solid';
 
-const FeedbackPage = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { score, totalQuestions, answers, quiz, startTime } = location.state || {};
-  const [durationText, setDurationText] = useState('0m 0s');
-  const [expandedQuestion, setExpandedQuestion] = useState(null);
+const ScoreDisplay = ({ score, totalQuestions, percentage, passed, durationText }) => {
+  return (
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 md:p-12 border-2 border-blue-200 shadow-lg">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center gap-3 mb-3">
+          {passed ? (
+            <CheckCircleIcon className="w-10 h-10 text-green-600" />
+          ) : (
+            <XCircleIcon className="w-10 h-10 text-red-600" />
+          )}
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+            {passed ? '✓ Selesai!' : '✗ Coba Lagi'}
+          </h1>
+        </div>
+        <p className="text-gray-600 text-lg">
+          {passed
+            ? 'Congratulations! Anda telah menyelesaikan kuis dengan baik'
+            : 'Anda perlu menjawab lebih banyak pertanyaan dengan benar'}
+        </p>
+      </div>
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
+      {/* Score Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Score */}
+        <div className="bg-white rounded-xl p-6 text-center shadow-md">
+          <p className="text-gray-600 font-medium text-sm mb-2">Skor Anda</p>
+          <p className="text-4xl md:text-5xl font-bold text-blue-600 mb-1">
+            {score}/{totalQuestions}
+          </p>
+          <p className="text-gray-500 text-sm">soal terjawab benar</p>
+        </div>
 
-    if (startTime) {
-      const endTime = new Date();
-      const duration = Math.floor((endTime - new Date(startTime)) / 1000);
-      const minutes = Math.floor(duration / 60);
-      const seconds = duration % 60;
-      setDurationText(`${minutes}m ${seconds}s`);
-    }
-  }, [startTime]);
-
-  if (score === undefined || score === null) {
-    return (
-      <div className="h-screen flex flex-col bg-white relative">
-        <div
-          className="fixed inset-0 pointer-events-none opacity-15"
-          style={{
-            backgroundImage: `url(${bgPattern})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        />
-        <div className="relative z-10 flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="bg-white p-12 rounded-2xl shadow-xl">
-              <XCircleIcon className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-              <h1 className="text-3xl font-bold text-gray-800 mb-3">Data Tidak Ditemukan</h1>
-              <p className="text-gray-600 mb-8 text-lg">Silakan mulai kuis terlebih dahulu</p>
-              <Button onClick={() => navigate('/quiz')} variant="primary" className="px-8 py-3">
-                Kembali ke Kuis
-              </Button>
-            </div>
+        {/* Percentage */}
+        <div className="bg-white rounded-xl p-6 text-center shadow-md">
+          <p className="text-gray-600 font-medium text-sm mb-2">Persentase</p>
+          <p className="text-4xl md:text-5xl font-bold text-indigo-600 mb-1">
+            {percentage}%
+          </p>
+          <div className="w-full bg-gray-200 rounded-full h-2 mt-3">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                passed ? 'bg-green-500' : 'bg-red-500'
+              }`}
+              style={{ width: `${percentage}%` }}
+            />
           </div>
         </div>
+
+        {/* Duration */}
+        <div className="bg-white rounded-xl p-6 text-center shadow-md">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <ClockIcon className="w-5 h-5 text-orange-500" />
+            <p className="text-gray-600 font-medium text-sm">Durasi</p>
+          </div>
+          <p className="text-4xl md:text-5xl font-bold text-orange-600 mb-1">
+            {durationText}
+          </p>
+          <p className="text-gray-500 text-sm">waktu pengerjaan</p>
+        </div>
       </div>
-    );
-  }
 
-  const percentage = Math.round((score / totalQuestions) * 100);
-  const passed = score >= Math.ceil(totalQuestions * 0.6); // 60% pass
-
-  const handleRetakeQuiz = () => {
-    navigate('/quiz-intro', { state: { quiz } });
-  };
-
-  return (
-    <div className="space-y-8">
-      {/* Score Display */}
-      <ScoreDisplay
-        score={score}
-        totalQuestions={totalQuestions}
-        percentage={percentage}
-        passed={passed}
-        durationText={durationText}
-      />
-
-      {/* Answer Review */}
-      <AnswerReview
-        quiz={quiz}
-        answers={answers}
-        expandedQuestion={expandedQuestion}
-        onToggleExpand={setExpandedQuestion}
-      />
-
-      {/* Action Buttons */}
-      <div className="flex gap-4 justify-center">
-        <Button
-          onClick={handleRetakeQuiz}
-          variant="primary"
-          className="px-8 py-3 text-lg flex items-center gap-2"
-        >
-          <ArrowPathIcon className="w-5 h-5" />
-          Ulangi Kuis
-        </Button>
-        <Button
-          onClick={() => navigate('/')}
-          variant="secondary"
-          className="px-8 py-3 text-lg flex items-center gap-2"
-        >
-          <HomeIcon className="w-5 h-5" />
-          Kembali ke Beranda
-        </Button>
+      {/* Result Message */}
+      <div
+        className={`p-6 rounded-xl border-2 text-center ${
+          passed
+            ? 'bg-green-50 border-green-300 text-green-800'
+            : 'bg-red-50 border-red-300 text-red-800'
+        }`}
+      >
+        <p className="font-semibold text-lg mb-2">
+          {passed
+            ? '🎉 Selamat!  Anda Lulus!'
+            : '📚 Perlu Belajar Lebih Lanjut'}
+        </p>
+        <p className="text-sm">
+          {passed
+            ? `Anda telah menjawab ${percentage}% soal dengan benar.  Bagus sekali!  Lanjutkan ke pembelajaran berikutnya.`
+            : `Anda baru mencapai ${percentage}%. Coba lagi untuk mendapatkan minimal 60% untuk lulus.`}
+        </p>
       </div>
     </div>
   );
 };
 
-export default FeedbackPage;
+export default ScoreDisplay;
