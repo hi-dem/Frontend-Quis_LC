@@ -1,132 +1,128 @@
-import React from 'react';
-import { CheckCircleIcon, XCircleIcon, ChevronDownIcon, ChevronRightIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/solid';
-import Card from '../Common/Card';
+import React, { useState } from 'react';
+import { ChevronDownIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
 
-const AnswerReview = ({ quiz, answers, expandedQuestion, onToggleExpand }) => {
+const AnswerReview = ({ quiz, answers }) => {
+  const [expandedQuestion, setExpandedQuestion] = useState(null);
+
   if (!quiz || !quiz.questions) {
-    return null;
+    return <div className="text-gray-600">No questions available</div>;
   }
 
   return (
-    <Card title={<span className="flex items-center gap-2"><ClipboardDocumentCheckIcon className="w-6 h-6 text-blue-500" />Detail Jawaban</span>}>
-      <div className="space-y-4">
-        {quiz. questions.map((question, index) => {
-          const userAnswer = answers[index];
-          const isCorrect = userAnswer === question.correctAnswer;
-          const isExpanded = expandedQuestion === index;
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Detail Jawaban</h2>
 
-          return (
-            <div
-              key={index}
-              className={`rounded-xl border-l-4 overflow-hidden ${
-                isCorrect
-                  ? 'bg-green-50 border-green-500'
-                  : 'bg-red-50 border-red-500'
-              }`}
+      {quiz.questions.map((question, idx) => {
+        const userAnswer = answers[idx];
+        const isCorrect = userAnswer === question.correctAnswer;
+
+        return (
+          <div
+            key={idx}
+            className="border-l-4 border-blue-500 bg-gray-50 rounded-lg overflow-hidden shadow-sm"
+          >
+            <button
+              onClick={() => setExpandedQuestion(expandedQuestion === idx ? null : idx)}
+              className="w-full text-left p-4 flex items-start justify-between hover:bg-gray-100 transition"
             >
-              {/* Question Header */}
-              <div
-                className="p-5 cursor-pointer hover:opacity-80 transition-opacity"
-                onClick={() => onToggleExpand(isExpanded ?  null : index)}
-              >
-                <div className="flex items-start gap-4">
-                  <div className={`flex-shrink-0 ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                    {isCorrect ? (
-                      <CheckCircleIcon className="w-6 h-6" />
-                    ) : (
-                      <XCircleIcon className="w-6 h-6" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-bold text-gray-900 text-lg">
-                      Q{index + 1}: {question.question}
-                    </p>
-                  </div>
-                  <div className="text-gray-400">
-                    {isExpanded ?  (
-                      <ChevronDownIcon className="w-5 h-5" />
-                    ) : (
-                      <ChevronRightIcon className="w-5 h-5" />
-                    )}
-                  </div>
+              <div className="flex items-start gap-3 flex-1">
+                {isCorrect ? (
+                  <CheckCircleIcon className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <XCircleIcon className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
+                )}
+                <div className="flex-1 text-left">
+                  <p className="font-semibold text-gray-800">
+                    Q{idx + 1}: {question.question}
+                  </p>
+                  <p className={`text-sm mt-1 font-semibold ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                    Your answer: {userAnswer}
+                  </p>
                 </div>
               </div>
+              <ChevronDownIcon
+                className={`w-5 h-5 text-gray-500 flex-shrink-0 transition transform ${
+                  expandedQuestion === idx ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
 
-              {/* Expanded Details */}
-              {isExpanded && (
-                <div className="border-t border-current border-opacity-10 p-5 space-y-4">
-                  {/* All Options */}
-                  <div>
-                    <p className="text-sm font-semibold text-gray-700 mb-3">
-                      Semua Pilihan Jawaban:
-                    </p>
-                    <div className="space-y-2">
-                      {question.answers.map((option, optIdx) => {
-                        const isUserAnswer = userAnswer === option;
-                        const isCorrectOption = option === question.correctAnswer;
+            {expandedQuestion === idx && (
+              <div className="border-t border-gray-200 p-6 bg-white space-y-4">
+                {/* All Answer Options */}
+                <div>
+                  <p className="text-sm font-semibold text-gray-700 mb-3">Pilihan Jawaban:</p>
+                  <div className="space-y-2">
+                    {question.answers.map((answer, ansIdx) => {
+                      const isUserAnswer = answer === userAnswer;
+                      const isCorrectAnswer = answer === question.correctAnswer;
+                      
+                      let bgColor = 'bg-gray-50';
+                      let borderColor = 'border-gray-200';
+                      let textColor = 'text-gray-700';
+                      
+                      if (isCorrectAnswer) {
+                        bgColor = 'bg-green-50';
+                        borderColor = 'border-green-300';
+                        textColor = 'text-green-800';
+                      } else if (isUserAnswer && !isCorrect) {
+                        bgColor = 'bg-red-50';
+                        borderColor = 'border-red-300';
+                        textColor = 'text-red-800';
+                      }
 
-                        return (
-                          <div
-                            key={optIdx}
-                            className={`p-3 rounded border-l-4 ${
-                              isCorrectOption
-                                ? 'bg-green-100 border-green-500 text-green-900'
-                                : isUserAnswer && !isCorrect
-                                  ? 'bg-red-100 border-red-500 text-red-900'
-                                  : 'bg-gray-100 border-gray-300 text-gray-700'
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              {isCorrectOption ? (
-                                <CheckCircleIcon className="w-5 h-5 text-green-600 flex-shrink-0" />
-                              ) : isUserAnswer ?  (
-                                <XCircleIcon className="w-5 h-5 text-red-600 flex-shrink-0" />
-                              ) : (
-                                <div className="w-5 h-5 rounded-full border-2 border-gray-400 flex-shrink-0" />
-                              )}
-                              <p className="text-sm font-semibold flex-1">{option}</p>
-                              {isCorrectOption && (
-                                <span className="ml-auto text-xs font-bold">BENAR</span>
-                              )}
-                              {isUserAnswer && !isCorrect && (
-                                <span className="ml-auto text-xs font-bold">JAWABAN ANDA</span>
-                              )}
-                            </div>
+                      return (
+                        <div
+                          key={ansIdx}
+                          className={`p-3 rounded-lg border-2 ${bgColor} ${borderColor} ${textColor}`}
+                        >
+                          <div className="flex items-start gap-2">
+                            <span className="font-semibold min-w-fit">
+                              {String.fromCharCode(65 + ansIdx)}. 
+                            </span>
+                            <span>{answer}</span>
+                            {isCorrectAnswer && (
+                              <span className="ml-auto">
+                                <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                              </span>
+                            )}
+                            {isUserAnswer && !isCorrect && (
+                              <span className="ml-auto">
+                                <XCircleIcon className="w-5 h-5 text-red-600" />
+                              </span>
+                            )}
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Feedback & Explanation */}
-                  <div className={`p-4 rounded-lg border-l-4 ${
-                    isCorrect
-                      ? 'bg-green-100 border-green-500'
-                      : 'bg-red-100 border-red-500'
-                  }`}>
-                    <p className={`font-bold text-base mb-2 flex items-center gap-2 ${
-                      isCorrect ? 'text-green-700' : 'text-red-700'
-                    }`}>
-                      {isCorrect ? (
-                        <CheckCircleIcon className="w-5 h-5" />
-                      ) : (
-                        <XCircleIcon className="w-5 h-5" />
-                      )}
-                      {isCorrect ? 'Jawaban Benar!' : 'Jawaban Salah!'}
-                    </p>
-                    <p className={`text-sm leading-relaxed font-medium ${
-                      isCorrect ? 'text-green-800' : 'text-red-800'
-                    }`}>
-                      {question.explanation}
-                    </p>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </Card>
+
+                {/* Explanation */}
+                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                  <p className="text-sm font-semibold text-blue-900 mb-2">Penjelasan:</p>
+                  <p className="text-sm text-blue-800">{question.explanation}</p>
+                </div>
+
+                {/* Result Summary */}
+                <div className={`p-4 rounded-lg ${isCorrect ? 'bg-green-50' : 'bg-red-50'}`}>
+                  {isCorrect ? (
+                    <p className="text-sm font-semibold text-green-700">✓ Jawaban Anda Benar! </p>
+                  ) : (
+                    <div>
+                      <p className="text-sm font-semibold text-red-700 mb-2">✗ Jawaban Anda Salah</p>
+                      <p className="text-sm text-red-700">
+                        <span className="font-semibold">Jawaban yang benar:</span> {question.correctAnswer}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 };
 

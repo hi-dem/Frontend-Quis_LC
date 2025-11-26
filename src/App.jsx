@@ -24,7 +24,17 @@ function App() {
             {/* Test: Results page dengan mock data */}
             <Route 
               path="/results-test" 
-              element={<Feedback />}
+              element={
+                <LayoutWrapper
+                  showBottomNav={true}
+                  prevLabel="Beranda"
+                  prevPath="/"
+                  nextLabel="Modul Berikutnya"
+                  nextPath="/material"
+                >
+                  <Feedback />
+                </LayoutWrapper>
+              }
             />
 
             {/* Redirect root to material */}
@@ -85,10 +95,20 @@ function App() {
               }
             />
 
-            {/* Results */}
+            {/* Results - dengan LayoutWrapper */}
             <Route
               path="/results"
-              element={<Feedback />}
+              element={
+                <LayoutWrapper
+                  showBottomNav={true}
+                  prevLabel="Beranda"
+                  prevPath="/"
+                  nextLabel="Modul Berikutnya"
+                  nextPath="/material"
+                >
+                  <Feedback />
+                </LayoutWrapper>
+              }
             />
           </Routes>
         </QuizProvider>

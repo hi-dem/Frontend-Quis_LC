@@ -69,19 +69,22 @@ const LayoutWrapper = ({
       />
 
       {/* Header */}
-      <Header />
+      <div className='fixed w-full z-20'>
+              <Header />
+
+      </div>
 
       {/* Content Row */}
       <div className="flex flex-1 w-full">
         {/* Main Content */}
-        <main className="flex-1 px-6 md:px-8 lg:px-10 pt-8 pb-24 max-w-5xl mx-auto">
+        <main className={`flex-1 max-w-7xl mx-auto pl-8 pt-28 pb-24 lg:pb-32 w-full ${sidebarOpen ? 'lg:pr-[340px]' : 'lg:pr-[100px] '}`}>
           {React.cloneElement(children, {
             onCompletion: (completed) => setIsCompleted(completed)
           })}
         </main>
 
         {/* Sidebar - Desktop Only */}
-        <div className="hidden lg:block relative">
+        <div className="hidden lg:block fixed right-0 top-16 h-full">
           <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
         </div>
       </div>

@@ -36,10 +36,10 @@ const QuizIntroPage = () => {
           <p className="text-sm font-semibold">Quiz Submodul</p>
         </div>
 
-        <h1 className="text-5xl font-bold">LearnCheck! </h1>
+        <h1 className="text-5xl font-bold">LearnCheck</h1>
 
         <p className="text-lg italic text-blue-100">
-          "Let's have some fun and test your understanding!"
+          "Mari kita uji pemahamanmu!"
         </p>
 
         <div className="bg-white text-gray-900 rounded-2xl p-8 mt-8 space-y-6">
@@ -60,7 +60,7 @@ const QuizIntroPage = () => {
               <ClockIcon className="w-6 h-6 text-blue-600" />
               <div className="text-center">
                 <p className="text-gray-600 font-medium">Durasi</p>
-                <p className="text-2xl font-bold text-gray-900">{quiz. durationPerQuestion} detik/soal</p>
+                <p className="text-2xl font-bold text-gray-900">{quiz.durationPerQuestion} detik/soal</p>
               </div>
             </div>
           </div>

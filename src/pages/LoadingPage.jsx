@@ -1,56 +1,69 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import Lottie from 'lottie-react';
+import loadingAnimation from '../assets/animations/loading.json';
+import bgPattern from '../assets/bg-pattern.svg';
 
 const LoadingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { quiz } = location.state || {};
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigate('/quiz', { state: { quiz } });
-    }, 2000);
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(interval);
+          return prev;
+        }
+        return prev + Math.random() * 30;
+      });
+    }, 500);
 
-    return () => clearTimeout(timer);
+    const timer = setTimeout(() => {
+      setProgress(100);
+      navigate('/quiz', { state: { quiz } });
+    }, 3000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timer);
+    };
   }, [navigate, quiz]);
 
   return (
-    <div className="bg-gradient-to-b from-blue-600 to-blue-500 rounded-3xl p-12 text-white shadow-2xl border-4 border-blue-700">
-      
-      {/* Window Chrome Effect */}
-      <div className="flex gap-3 mb-6">
-        <div className="w-4 h-4 rounded-full bg-red-500"></div>
-        <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
-        <div className="w-4 h-4 rounded-full bg-green-500"></div>
-      </div>
-
-      {/* Loading Content */}
-      <div className="text-center space-y-8 py-12">
-        
-        {/* Hourglass Icon */}
-        <div className="flex justify-center">
-          <div className="text-7xl animate-bounce">
-            ⏳
+    <div
+      className="min-h-screen w-full flex items-center justify-center bg-blue-50 p-4 relative overflow-hidden"
+      style={{
+        backgroundImage: `url(${bgPattern})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <div className="relative z-10 text-center max-w-md">
+        <div className="mb-8 flex justify-center">
+          <div className="w-48 h-48 bg-white rounded-2xl shadow-lg p-4">
+            <Lottie
+              animationData={loadingAnimation}
+              loop={true}
+              autoplay={true}
+            />
           </div>
         </div>
 
-        {/* Loading Text */}
-        <div className="space-y-4">
-          <h2 className="text-4xl font-bold">Tunggu sebentar!</h2>
-          <p className="text-xl text-blue-100">
-            Kami sedang mempersiapkan soal untuk Anda... 
-          </p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-3">Tunggu sebentar! </h1>
+        <p className="text-gray-600 text-lg mb-8">Kami sedang mempersiapkan soal untuk Anda...</p>
+
+        <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+          <div
+            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
         </div>
 
-        {/* Loading Animation Dots */}
-        <div className="flex justify-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-white animate-bounce"></div>
-          <div className="w-3 h-3 rounded-full bg-white animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-          <div className="w-3 h-3 rounded-full bg-white animate-bounce" style={{ animationDelay: '0. 4s' }}></div>
-        </div>
-
-        {/* Progress Text */}
-        <p className="text-sm text-blue-100 italic">
+        <p className="text-sm text-gray-500">
           Generating soal dengan AI... Jangan ditutup halaman ini!
         </p>
       </div>

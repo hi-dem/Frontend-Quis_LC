@@ -55,7 +55,7 @@ const ModuleList = ({ onSelectModule }) => {
       }`}
     >
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        <span className="text-lg">📝</span>
+        <span className="text-lg"></span>
         <p className="text-sm leading-snug truncate text-gray-700">
           Quiz Submodul #{quizNumber}
         </p>
@@ -74,7 +74,7 @@ const ModuleList = ({ onSelectModule }) => {
             toggleSubmoduleExpand(submodule.id);
             handleSubmoduleClick(submodule);
           }}
-          className={`py-2 px-3 ml-6 rounded cursor-pointer transition-all border-l-4 flex items-center justify-between ${
+          className={`px-3 ml-6  rounded cursor-pointer transition-all border-l-4 flex items-center justify-between ${
             submodule.isLocked ?  'opacity-60 cursor-not-allowed' : 'border-transparent hover:bg-gray-50'
           }`}
         >
@@ -116,7 +116,7 @@ const ModuleList = ({ onSelectModule }) => {
             >
               <ChevronRightIcon className="w-4 h-4 text-gray-400" />
             </span>
-            <span className="text-lg">📚</span>
+            <span className="text-lg"></span>
             <p className="text-sm font-semibold text-gray-900">
               {module.title}
             </p>
@@ -137,22 +137,16 @@ const ModuleList = ({ onSelectModule }) => {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden h-fit sticky top-20">
-      <div className="bg-gray-50 border-b border-gray-200 p-4">
+    <div className="bg-white shadow-lg h-full rounded  ">
+      <div className="  p-4">
         <div className="flex items-center gap-2">
-          <span className="text-blue-600 font-bold text-lg">›</span>
           <h3 className="text-lg font-bold text-gray-900">Daftar Modul</h3>
         </div>
       </div>
 
       <div className="p-3 max-h-96 overflow-y-auto space-y-2">
         {topic.modules.map(module => renderModule(module))}
-      </div>
-
-      <div className="bg-gray-50 border-t border-gray-200 px-4 py-3 flex items-center justify-between hover:bg-gray-100 transition-colors cursor-pointer">
-        <p className="text-sm font-semibold text-blue-600">Pelajari Lebih Lanjut</p>
-        <span className="text-blue-600 font-bold">›</span>
-      </div>
+      </div>  
     </div>
   );
 };

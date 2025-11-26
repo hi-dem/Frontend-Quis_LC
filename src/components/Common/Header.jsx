@@ -26,9 +26,7 @@ const Header = () => {
 
   return (
     <header
-      className={`sticky top-0 z-50 backdrop-blur bg-white/90 transition-shadow ${
-        elevated ? 'shadow-sm border-b border-gray-200' : 'border-b border-transparent'
-      }`}
+      className={`sticky top-0 z-50 backdrop-blur bg-white/90 transition-shadow border-b border-gray-200`}
       style={{ height: 64 }}
     >
       <div className="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
