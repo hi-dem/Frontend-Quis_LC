@@ -31,7 +31,7 @@ const Header = () => {
     >
       <div className="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <div className="text-3xl">🧠</div>
+          <div className="text-3xl"></div>
           <h1 className="text-xl font-bold text-gray-900">Belajar Dasar AI</h1>
         </div>
         <div className="relative">

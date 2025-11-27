@@ -12,7 +12,6 @@ const mockTopics = [
           {
             id: '1. 1',
             title: 'Penerangan AI dalam Dunia Nyata',
-            icon: '🌍',
             isLocked: false,
             content: {
               title: 'Penerangan AI dalam Dunia Nyata',
@@ -41,7 +40,6 @@ const mockTopics = [
           {
             id: '1.2',
             title: 'Pengenalan AI',
-            icon: '🧠',
             isLocked: true,
             content: {
               title: 'Pengenalan AI',
@@ -66,7 +64,6 @@ const mockTopics = [
           {
             id: '1.3',
             title: 'Taksonomi AI',
-            icon: '📊',
             isLocked: true,
             content: {
               title: 'Taksonomi AI',
@@ -91,7 +88,6 @@ const mockTopics = [
           {
             id: '1.4',
             title: 'AI Workflow',
-            icon: '⚙️',
             isLocked: true,
             content: {
               title: 'AI Workflow',
@@ -119,7 +115,6 @@ const mockTopics = [
           {
             id: '2.1',
             title: 'Pengenalan Data',
-            icon: '📈',
             isLocked: true,
             content: {
               title: 'Pengenalan Data',
