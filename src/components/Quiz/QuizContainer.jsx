@@ -8,6 +8,7 @@ import FeedbackDisplay from './FeedbackDisplay';
 import ReviewModal from './ReviewModal';
 import mockQuizzes from '../../data/mockQuizzes';
 import { shuffleArray } from '../../utils/helpers';
+// bgPattern import kept if used elsewhere; not used for page background here
 import bgPattern from '../../assets/bg-pattern.svg';
 
 const shuffleQuestions = (questions, count = 3) => {
@@ -104,7 +105,7 @@ const QuizContainer = () => {
   }, [answers, currentQuestionIndex, shuffledQuestions, tutorialId, userId, startTime, timeoutQuestions]);
 
   const currentQuestion = shuffledQuestions[currentQuestionIndex];
-  const totalQuestions = shuffledQuestions. length;
+  const totalQuestions = shuffledQuestions.length;
 
   // Timer logic
   useEffect(() => {
@@ -137,11 +138,11 @@ const QuizContainer = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentQuestionIndex, totalQuestions, durationPerQuestion, shuffledQuestions. length]);
+  }, [currentQuestionIndex, totalQuestions, durationPerQuestion, shuffledQuestions.length]);
 
   // Update selected answer
   useEffect(() => {
-    if (! currentQuestion) return;
+    if (!currentQuestion) return;
 
     const alreadyAnswered = answers[currentQuestionIndex];
     const isTimeout = timeoutQuestions.has(currentQuestionIndex);
@@ -160,7 +161,7 @@ const QuizContainer = () => {
   }, [currentQuestionIndex, answers, currentQuestion, timeoutQuestions]);
 
   const handleAnswerSelect = useCallback((answer) => {
-    if (! currentQuestion) return;
+    if (!currentQuestion) return;
 
     if (timeoutQuestions.has(currentQuestionIndex)) {
       console.warn('Waktu soal ini sudah habis');
@@ -226,7 +227,7 @@ const QuizContainer = () => {
       }
     });
 
-    console. log('Final score:', correctCount, 'out of', totalQuestions);
+    console.log('Final score:', correctCount, 'out of', totalQuestions);
 
     const storageKey = `quiz_${tutorialId}_${userId}`;
     localStorage.removeItem(storageKey);
@@ -236,7 +237,7 @@ const QuizContainer = () => {
       totalQuestions: totalQuestions,
       answers: answers,
       quiz: {
-        ... quiz,
+        ...quiz,
         questions: shuffledQuestions,
         totalQuestions: totalQuestions
       },
@@ -258,7 +259,7 @@ const QuizContainer = () => {
   const canGoBack = currentQuestionIndex > 0;
   const canGoForward = showFeedback || timeoutQuestions.has(currentQuestionIndex);
 
-  if (! currentQuestion || shuffledQuestions.length === 0) {
+  if (!currentQuestion || shuffledQuestions.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-lg text-gray-600">Loading...</p>
@@ -268,15 +269,7 @@ const QuizContainer = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4 md:p-6 relative">
-      <div
-        className="fixed inset-0 pointer-events-none opacity-15"
-        style={{
-          backgroundImage: `url(${bgPattern})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
-        }}
-      />
+      {/* Background removed here — LayoutWrapper already provides the page background. */}
 
       <div className="max-w-4xl mx-auto relative z-10">
         <QuizHeader
@@ -290,7 +283,7 @@ const QuizContainer = () => {
 
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 animate-slideUp">
           <QuestionDisplay
-            question={currentQuestion. question}
+            question={currentQuestion.question}
             questionNumber={currentQuestionIndex + 1}
             totalQuestions={totalQuestions}
           />
@@ -312,7 +305,7 @@ const QuizContainer = () => {
             />
           )}
 
-          {isCurrentTimeUp && ! showFeedback && (
+          {isCurrentTimeUp && !showFeedback && (
             <div className="mt-8 p-6 rounded-xl border-l-4 bg-orange-50 border-orange-500">
               <p className="text-orange-700 font-semibold">
                 Waktu habis untuk soal ini.  Anda dapat melanjutkan ke soal berikutnya.

@@ -2,21 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Font */
+/* Font (tipografi) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* ==============================
-   CSS VARIABLES (easy theming)
+   VARIABEL CSS (memudahkan pengaturan tema)
    ============================== */
 :root {
-  --color-bg-body: #f0f4ff;          /* Body background (ganti kalau terlalu biru) */
+  --color-bg-body: #f0f4ff;          /* Latar belakang body */
   --color-text-base: #1f2937;
-  --color-bottom-bar-bg: #06111C;    /* Warna bottom nav (ganti sesuai Figma) */
+  --color-bottom-bar-bg: #06111C;
   --color-bottom-bar-border: #142233;
   --color-bottom-bar-text: #c9d1d9;
   --color-scrollbar-track: #f0f3f5;
   --color-scrollbar-thumb: #c5ced6;
   --color-scrollbar-thumb-hover: #aab5bf;
+  --sidebar-width: 0px; /* runtime akan di-overwrite oleh LayoutWrapper */
+
+  /* lebar konten kartu yang dipakai untuk men-center konten */
+  --content-card-width: 880px;
+
+  /* tinggi strip biru + jarak offset badge (ubah nilai ini untuk menaik/turunkan jarak) */
+  --blue-strip-height: 60px;
+  --badge-offset: 26px; /* <-- nilai ini menurunkan badge lebih jauh dari strip biru */
 }
 
 /* ==============================
@@ -38,8 +46,6 @@ html, body {
   color: var(--color-text-base);
 }
 
-/* Pastikan hanya body yang scroll (hindari nested scroll di container utama).
-   Komponen layout jangan gunakan overflow-y-auto untuk wrapper utama kecuali sidebar. */
 body {
   overscroll-behavior-y: none;
 }
@@ -69,7 +75,7 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 /* ==============================
-   ANIMATIONS
+   ANIMATIONS (animasi kecil)
    ============================== */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -79,36 +85,14 @@ body::-webkit-scrollbar-thumb:hover {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
 .animate-fadeIn { animation: fadeIn 0.3s ease-in; }
-.animate-slideUp { animation: slideUp 0.3s ease-out; }
-.animate-slideDown { animation: slideDown 0.3s ease-out; }
-.animate-bounce { animation: bounce 0.6s ease-in-out; }
-.animate-shake { animation: shake 0.4s ease-in-out; }
-.animate-pulse { animation: pulse 2s ease-in-out infinite; }
+.animate-slideUp { animation: slideUp 0.28s ease-out; }
 
 /* ==============================
-   CUSTOM COMPONENT UTILITIES
+   TAILWIND COMPONENT HELPERS
+   - utilitas untuk beberapa komponen agar bisa digunakan dengan @apply
    ============================== */
 @layer components {
-  /* Bottom navigation bar gaya Figma */
   .bottom-bar {
     @apply fixed bottom-0 left-0 right-0 z-40 flex items-center;
     height: 56px;
@@ -127,25 +111,13 @@ body::-webkit-scrollbar-thumb:hover {
     color: var(--color-bottom-bar-text);
   }
   .bottom-bar-btn:hover {
-    color: #3b82f6; /* Tailwind blue-500 hover */
-  }
-  .bottom-bar-btn span:nth-child(1),
-  .bottom-bar-btn span:last-child {
-    @apply transition-transform;
-  }
-  .bottom-bar-btn:hover span.arrow-left {
-    transform: translateX(-4px);
-  }
-  .bottom-bar-btn:hover span.arrow-right {
-    transform: translateX(4px);
+    color: #3b82f6;
   }
 
-  /* Sidebar toggle buttons */
   .sidebar-toggle {
     @apply w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-lg transition;
   }
 
-  /* Smooth panel appearance */
   .panel {
     @apply bg-white rounded-xl shadow;
     animation: fadeIn 0.25s ease;
@@ -153,31 +125,420 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 /* ==============================
-   UTILITY HELPERS
+   HELPERS (kelas utilitas kecil)
    ============================== */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar {
-  -ms-overflow-style: none;  /* IE 10+ */
-  scrollbar-width: none;     /* Firefox */
-}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.has-bottom-bar { padding-bottom: 80px; }
 
-/* Padding bottom agar konten tidak tertutup bottom bar */
-.has-bottom-bar {
-  padding-bottom: 80px; /* > 56px untuk aman */
+/* ==============================
+   PATTERN / BACKGROUND (ditangani oleh LayoutWrapper)
+   - LayoutWrapper menempelkan gambar pattern via inline style; aturan di sini hanya fallback/overlay.
+   ============================== */
+.pattern-container {
+  position: relative;
+  z-index: 0;
+  overflow: visible;
+  width: 100%;
+}
+.pattern-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: cover;
+  pointer-events: none;
+  image-rendering: auto;
+  -webkit-backface-visibility: hidden;
+}
+.pattern-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: rgba(255,255,255,0.78); /* overlay lembut agar teks tetap terbaca */
+  transition: background 160ms ease;
 }
 
 /* ==============================
-   OPTIONAL THEME SWITCH (if needed)
+   QUIZ INTRO / HERO LAYOUT — PERUBAHAN JARAK BADGE
+   - Mengubah posisi badge menjadi absolute dengan top = blue height + badge-offset
+   - Menyesuaikan padding-top pada body agar konten tidak tertutup badge
+   - Gunakan --badge-offset untuk menambah/menurunkan jarak; nilai lebih besar = jarak lebih jauh
    ============================== */
-[data-theme='dark'] {
-  --color-bg-body: #0d1117;
-  --color-text-base: #e6edf3;
-  --color-bottom-bar-bg: #010409;
-  --color-bottom-bar-border: #1f2328;
-  --color-bottom-bar-text: #8b949e;
-  --color-scrollbar-track: #161b22;
-  --color-scrollbar-thumb: #30363d;
-  --color-scrollbar-thumb-hover: #4a545d;
+
+/* wrapper luar untuk memberi spasi vertikal */
+.quiz-intro-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 56px; /* ruang untuk header tetap */
+  padding-bottom: 56px;
+  box-sizing: border-box;
+}
+
+/* kontainer utama: strip biru + body putih satu kesatuan */
+.quiz-hero {
+  width: 100%;
+  max-width: calc(var(--content-card-width) + 80px);
+  margin: 0 auto;
+  position: relative;
+  border-radius: 16px; /* radius pada seluruh kontainer */
+  overflow: hidden;     /* mencegah celah antara biru dan putih */
+  box-shadow: 0 14px 50px rgba(16,24,40,0.06);
+  background: linear-gradient(180deg, #2d6df6 0%, #2563eb 100%); /* fallback warna biru */
+}
+
+/* ==============================
+   NEW: Center & Shift behaviour with sidebar-aware CSS
+   - Default: centered
+   - When html.sidebar-open: shift-left & shrink width
+   - Smooth transitions and subtle entrance animation
+   ============================== */
+
+/* entrance animation */
+@keyframes hero-appear {
+  from { opacity: 0; transform: translateY(10px) scale(.995); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* base fixed-centered rules (centered when sidebar closed) */
+.quiz-hero.fixed-centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1100;
+  width: min(960px, 92%);
+  max-width: 960px;
+  margin: 0;
+  box-shadow: 0 30px 80px rgba(16,24,40,0.18);
+  overflow: visible;
+  border-radius: 16px;
+  background-clip: padding-box;
+
+  /* transitions for smooth shifting when sidebar toggles */
+  transition:
+    left 260ms cubic-bezier(.2,.9,.28,1),
+    transform 260ms cubic-bezier(.2,.9,.28,1),
+    width 260ms cubic-bezier(.2,.9,.28,1),
+    max-width 260ms cubic-bezier(.2,.9,.28,1),
+    padding 260ms cubic-bezier(.2,.9,.28,1);
+
+  /* entrance */
+  animation: hero-appear 280ms ease both;
+}
+
+/* When sidebar is open we shift the modal left so it's visually centered
+   relative to the main content area (not viewport). The formula subtracts
+   half the sidebar width from the left origin */
+html.sidebar-open .quiz-hero.fixed-centered {
+  left: calc(50% - (var(--sidebar-width) / 2));
+  transform: translate(-50%, -50%) scale(1);
+  width: min(960px, calc(92% - var(--sidebar-width)));
+  max-width: calc(960px - var(--sidebar-width));
+}
+
+/* optional class if you want a slightly stronger shift + smaller scale */
+html.sidebar-open .quiz-hero.fixed-centered.shift-strong {
+  transform: translate(-50%, -50%) scale(.995);
+}
+
+/* strip biru dibuat sebagai pseudo-element sehingga terlihat menyatu */
+.quiz-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--blue-strip-height); /* tinggi area biru */
+  background: linear-gradient(180deg,#2d6df6 0%,#2563eb 100%);
+  z-index: 6;
+}
+
+/* letakkan tiga titik kecil di sudut kiri area biru */
+.quiz-hero .window-controls {
+  position: absolute;
+  left: 18px;
+  top: calc(var(--blue-strip-height) * 0.4);
+  display: flex;
+  gap: 8px;
+  z-index: 12;
+}
+
+/* gaya titik kecil (mirip kontrol jendela) */
+.window-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  display: inline-block;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06) inset;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+.window-dot.dot-red { background: #ff5f56; }
+.window-dot.dot-yellow { background: #ffbd2e; }
+.window-dot.dot-green { background: #27c93f; }
+
+/* badge di tengah yang menempel ke area biru/kartu putih
+   DIUBAH: sekarang absolute dan posisi top = height strip biru + badge-offset
+   (lebih jauh dari strip biru sesuai permintaan)
+*/
+.quiz-badge {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--blue-strip-height) + var(--badge-offset));
+  transform: translateX(-50%);
+  z-index: 14;
+  background: #2563eb;
+  color: #fff;
+  padding: 10px 28px;
+  border-radius: 9999px;
+  box-shadow: 0 10px 24px rgba(37,99,235,0.18);
+  font-weight: 600;
+}
+
+/* body putih kartu (langsung berada di bawah gradient biru)
+   Padding-top ditingkatkan agar ada ruang untuk badge yang diturunkan.
+*/
+.quiz-hero-body {
+  background: #ffffff;
+  padding: calc(var(--blue-strip-height) + var(--badge-offset) + 12px) 32px 48px;
+  text-align: center;
+  color: var(--color-text-base);
+  /* top radius sudah ditangani oleh .quiz-hero, jadi bukan di sini */
+  border-radius: 0 0 16px 16px;
+  position: relative;
+  z-index: 1;
+  margin-top: 0; /* pastikan tidak ada celah ekstra */
+  transition: padding 260ms cubic-bezier(.2,.9,.28,1);
+}
+
+/* reduce right padding when sidebar open so content appears balanced */
+html.sidebar-open .quiz-hero.fixed-centered .quiz-hero-body {
+  padding-right: calc(48px + (var(--sidebar-width) * 0.05));
+  padding-left: 48px;
+}
+
+/* gaya judul */
+.quiz-hero-body h1 {
+  font-size: 2.25rem;
+  line-height: 1.05;
+  margin-bottom: 6px;
+  color: #0b1220;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* subjudul / kutipan */
+.quiz-hero-body p.lead {
+  color: #475569;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+/* kartu info di dalam body (satu kartu putih) */
+.quiz-info-card {
+  background: #ffffff;
+  border: 1px solid rgba(15,23,42,0.06);
+  border-radius: 12px;
+  padding: 22px 20px;
+  margin: 18px auto 28px;
+  max-width: 820px;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.04);
+  text-align: left;
+}
+
+/* judul di dalam kartu info (rata tengah) */
+.quiz-info-card h2 {
+  text-align: center;
+  margin-bottom: 14px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* baris informasi (jumlah soal, durasi) */
+.info-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.icon-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f8ff;
+  color: #2563eb;
+  border: 1px solid rgba(37,99,235,0.06);
+}
+
+/* tombol CTA (centered below info card) */
+.quiz-cta {
+  display: inline-block;
+  background: linear-gradient(180deg,#2d6df6,#2563eb);
+  color: #fff;
+  padding: 12px 36px;
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: 0 16px 34px rgba(37,99,235,0.18);
+  margin-top: 6px;
+}
+
+/* ==============================
+   FULL-PAGE variant: buat white card jadi full-area & fixed
+   - digunakan oleh QuizIntroPage ketika class .full-page ditambahkan
+   ============================== */
+
+/* Full-page entrance/shift animation (re-used) */
+@keyframes hero-appear-full {
+  from { opacity: 0; transform: translateY(8px) scale(.997); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Full-page variant: larger fixed card that fills most of the viewport */
+.quiz-hero.fixed-centered.full-page {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  /* occupy most of viewport width, adjust for sidebar */
+  width: calc(100vw - 120px - var(--sidebar-width));
+  max-width: none;
+  height: calc(100vh - 120px);
+  margin: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(16,24,40,0.18);
+  background-clip: padding-box;
+  background: #ffffff;
+  transition:
+    left 320ms cubic-bezier(.2,.9,.28,1),
+    transform 320ms cubic-bezier(.2,.9,.28,1),
+    width 320ms cubic-bezier(.2,.9,.28,1),
+    height 320ms cubic-bezier(.2,.9,.28,1),
+    padding 260ms cubic-bezier(.2,.9,.28,1);
+  animation: hero-appear-full 300ms ease both;
+}
+
+/* Shift-left & width shrink when sidebar open */
+html.sidebar-open .quiz-hero.fixed-centered.full-page {
+  left: calc(50% - (var(--sidebar-width) / 2));
+  transform: translate(-50%, -50%);
+  width: calc(100vw - 120px - var(--sidebar-width));
+}
+
+/* Internal body should fill the card and be scrollable */
+.quiz-hero.fixed-centered.full-page .quiz-hero-body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: calc(var(--blue-strip-height) + var(--badge-offset) + 20px) 48px 48px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: padding 260ms cubic-bezier(.2,.9,.28,1);
+}
+
+/* inner content width limit for full-page */
+.quiz-hero.fixed-centered.full-page .quiz-info-card {
+  max-width: 860px;
+}
+
+/* small polish: badge shift when sidebar open */
+html.sidebar-open .quiz-hero.fixed-centered.full-page .quiz-badge {
+  transform: translateX(calc(-0.35 * var(--sidebar-width) * 0.01)) translateY(0);
+  transition: transform 260ms cubic-bezier(.2,.9,.28,1);
+}
+
+/* mobile fallback for full-page */
+@media (max-width: 1024px) {
+  .quiz-hero.fixed-centered.full-page {
+    width: calc(100vw - 32px);
+    height: calc(100vh - 80px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 12px;
+  }
+  .quiz-hero.fixed-centered.full-page .quiz-hero-body {
+    padding: calc(var(--blue-strip-height) + var(--badge-offset) + 12px) 18px 34px;
+  }
+}
+
+/* ==============================
+   -- PENAMBAHAN: fallback / safety rules
+   - non-scroll pada body saat card di-fix
+   - internal scroll untuk hero-body (safe)
+   ============================== */
+
+/* non-scroll pada body saat card di-fix */
+body.no-scroll {
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+
+/* internal scroll safety */
+.quiz-hero.fixed-centered .quiz-hero-body {
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* optional overlay (bungkus .quiz-hero dengan elemen ini untuk background redup) */
+.quiz-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.18);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  padding: 20px;
+}
+
+/* responsive adjustments untuk fixed mode */
+@media (max-width: 768px) {
+  .quiz-hero.fixed-centered {
+    width: calc(100% - 32px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    top: 50%;
+  }
+  .quiz-hero.fixed-centered .quiz-hero-body {
+    max-height: calc(100vh - 100px);
+  }
+  .quiz-overlay { padding: 12px; }
+}
+
+/* ==============================
+   Tweak kecil untuk halaman materi (helper)
+   ============================== */
+.material-foreground .breadcrumb { margin-bottom: 1rem; }
+.material-foreground h1, .material-foreground h2 { color: #0b4ee6; }
+.material-foreground a { color: #1d4ed8; text-decoration: underline; }
+.material-foreground img { max-width: 100%; height: auto; display: block; }
+.material-foreground pre, .material-foreground code {
+  background: rgba(250,250,250,0.9);
+  padding: 0.5rem;
+  border-radius: 6px;
+  overflow: auto;
+}
+
+/* Fokus aksesibilitas untuk keyboard users */
+:focus {
+  outline: 3px solid rgba(59,130,246,0.30);
+  outline-offset: 2px;
 }

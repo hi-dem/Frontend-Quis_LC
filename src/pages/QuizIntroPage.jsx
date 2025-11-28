@@ -10,11 +10,13 @@ const QuizIntroPage = () => {
 
   if (!quiz) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-600 mb-4">Quiz data tidak ditemukan</p>
-        <Button onClick={() => navigate('/')} variant="primary">
-          Kembali ke Beranda
-        </Button>
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="bg-white rounded-xl shadow p-6 text-center">
+          <p className="text-gray-600 mb-4">Quiz data tidak ditemukan</p>
+          <Button onClick={() => navigate('/')} variant="primary">
+            Kembali ke Beranda
+          </Button>
+        </div>
       </div>
     );
   }
@@ -24,54 +26,67 @@ const QuizIntroPage = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-blue-600 to-blue-500 rounded-3xl p-12 text-white shadow-2xl border-4 border-blue-700">
-      <div className="flex gap-3 mb-6">
-        <div className="w-4 h-4 rounded-full bg-red-500"></div>
-        <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
-        <div className="w-4 h-4 rounded-full bg-green-500"></div>
-      </div>
-
-      <div className="text-center space-y-6">
-        <div className="inline-block bg-white bg-opacity-30 px-6 py-2 rounded-full">
-          <p className="text-sm font-semibold">Quiz Submodul</p>
+    <div className="fixed h-[450px] flex items-start justify-center px-6 pt-2">
+      <div className="quiz-hero w-full max-w-4xl mx-auto">
+        {/* Bro wser-like top bar */}
+        <div className="quiz-window-bar rounded-t-2xl flex items-center px-4">
+          <div className="window-controls flex items-center gap-3">
+            <span className="window-dot dot-red" />
+            <span className="window-dot dot-yellow" />
+            <span className="window-dot dot-green" />
+          </div>
         </div>
 
-        <h1 className="text-5xl font-bold">LearnCheck</h1>
-
-        <p className="text-lg italic text-blue-100">
-          "Mari kita uji pemahamanmu!"
-        </p>
-
-        <div className="bg-white text-gray-900 rounded-2xl p-8 mt-8 space-y-6">
-          <h2 className="text-2xl font-bold text-center">
-            {quiz.title}
-          </h2>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-center gap-4">
-              <ClipboardDocumentCheckIcon className="w-6 h-6 text-blue-600" />
-              <div className="text-center">
-                <p className="text-gray-600 font-medium">Jumlah Soal</p>
-                <p className="text-2xl font-bold text-gray-900">{quiz.totalQuestions} Soal</p>
-              </div>
+        {/* Hero body */}
+        <div className="quiz-hero-body w-[750px] bg-pink-900 rounded-b-2xl shadow-lg p-8 text-center">
+          <div className="mb-6">
+            <div className="inline-block badge-hero bg-blue-600 text-white px-6 py-2 rounded-full font-medium">
+              Quiz Submodul
             </div>
+          </div>
 
-            <div className="flex items-center justify-center gap-4">
-              <ClockIcon className="w-6 h-6 text-blue-600" />
-              <div className="text-center">
-                <p className="text-gray-600 font-medium">Durasi</p>
-                <p className="text-2xl font-bold text-gray-900">{quiz.durationPerQuestion} detik/soal</p>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">LearnCheck!</h1>
+          <p className="text-lg text-gray-600 mb-8 italic">
+            “Let's have some fun and test your understanding!”
+          </p>
+
+          {/* Inner info card */}
+          <div className="quiz-info-card mx-auto rounded-xl p-6 mb-8">
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-4">{quiz.title}</h2>
+
+            <div className="flex flex-col sm:flex-row sm:justify-center gap-6 sm:gap-12">
+              <div className="flex items-center gap-3">
+                <div className="icon-circle bg-blue-50 text-blue-600">
+                  <ClipboardDocumentCheckIcon className="w-5 h-5" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm text-gray-600">Jumlah Soal:</p>
+                  <p className="text-md font-semibold text-gray-900">{quiz.totalQuestions} Soal</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="icon-circle bg-blue-50 text-blue-600">
+                  <ClockIcon className="w-5 h-5" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm text-gray-600">Durasi:</p>
+                  <p className="text-md font-semibold text-gray-900">{quiz.durationPerQuestion} detik/soal</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <Button
-            onClick={handleStartQuiz}
-            variant="primary"
-            className="w-full py-4 text-lg font-bold rounded-full"
-          >
-            Mulai Kuis
-          </Button>
+          {/* CTA */}
+          <div className="mx-auto" style={{ maxWidth: 420 }}>
+            <Button
+              onClick={handleStartQuiz}
+              variant="primary"
+              className="w-full py-3 text-base font-bold btn-hero"
+            >
+              Mulai Kuis
+            </Button>
+          </div>
         </div>
       </div>
     </div>
