@@ -151,7 +151,7 @@ const FeedbackPage = () => {
 
       {/* Answer Review - With Shadow */}
       {showReview && hasQuizData && quiz.questions && (
-        <div className="shadow-md rounded-2xl overflow-hidden">
+        <div className=" rounded-2xl overflow-hidden">
           <AnswerReview
             quiz={quiz}
             answers={answers}

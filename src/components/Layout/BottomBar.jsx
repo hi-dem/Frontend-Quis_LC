@@ -4,7 +4,7 @@ import { ChevronRightIcon } from '@heroicons/react/24/solid';
 const BottomBar = ({ prevLabel, nextLabel, onPrev, onNext, nextDisabled = false }) => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 px-6 md:px-8 lg:px-10 py-6 bg-white border-t border-gray-200">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <div className="max-w-8xl mx-auto flex justify-between items-center">
         {/* Left: Previous Button */}
         {prevLabel ?  (
           <button

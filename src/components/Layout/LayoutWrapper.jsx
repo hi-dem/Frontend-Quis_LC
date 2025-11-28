@@ -6,13 +6,6 @@ import Sidebar from './Sidebar';
 import BottomBar from './BottomBar';
 import bgPattern from '../../assets/bg-pattern.svg';
 
-/*
-  LayoutWrapper (finalized)
-  - Publishes --sidebar-width CSS variable and toggles html.sidebar-open when sidebarOpen changes.
-  - Keeps existing layout behavior (pattern-bg, sidebar, mobile sheet).
-  - Clones single child element and injects onCompletion prop if child is a valid React element.
-*/
-
 const LayoutWrapper = ({
   children,
   showBottomNav = true,
@@ -24,7 +17,8 @@ const LayoutWrapper = ({
   nextState = null,
   requiresCompletion = false,
   onPrevClick,
-  onNextClick
+  onNextClick,
+  fixedBackground = false
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -32,36 +26,23 @@ const LayoutWrapper = ({
 
   useEffect(() => {
     const handleCompletion = (e) => {
-      setIsCompleted(Boolean(e?.detail?.isCompleted));
+      setIsCompleted(e.detail.isCompleted);
     };
+
     window.addEventListener('material-completed', handleCompletion);
     return () => window.removeEventListener('material-completed', handleCompletion);
   }, []);
 
-  // Publish sidebar width and toggle html class for pages to adapt
-  useEffect(() => {
-    const desktopSidebarWidth = sidebarOpen ? '320px' : '0px'; // adjust if your sidebar width differs
-    document.documentElement.style.setProperty('--sidebar-width', desktopSidebarWidth);
-
-    if (sidebarOpen) document.documentElement.classList.add('sidebar-open');
-    else document.documentElement.classList.remove('sidebar-open');
-
-    return () => {
-      document.documentElement.style.setProperty('--sidebar-width', '0px');
-      document.documentElement.classList.remove('sidebar-open');
-    };
-  }, [sidebarOpen]);
-
   const handlePrev = () => {
     if (prevPath) {
-      navigate(prevPath, prevState ? { state: prevState } : {});
+      navigate(prevPath, prevState ?  { state: prevState } : {});
     } else if (onPrevClick) {
       onPrevClick();
     }
   };
 
   const handleNext = () => {
-    if (requiresCompletion && !isCompleted) {
+    if (requiresCompletion && ! isCompleted) {
       console.log('Selesaikan materi terlebih dahulu');
       return;
     }
@@ -73,21 +54,18 @@ const LayoutWrapper = ({
     }
   };
 
-  const renderedChildren = React.isValidElement(children)
-    ? React.cloneElement(children, { onCompletion: (completed) => setIsCompleted(completed) })
-    : children;
-
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-hidden">
+    <div className={`min-h-screen flex flex-col ${fixedBackground ? 'fixed' : 'relative' } overflow-x-hidden w-full`}>
       {/* Header (fixed on top) */}
       <div className="fixed w-full z-30">
         <Header />
       </div>
 
       {/* Pattern wrapper -> covers the boxed area (content + sidebar) */}
-      <div className="pattern-container relative w-full pt-[64px] lg:pt-[64px]">
+      <div className={`pattern-container relative w-full ${fixedBackground ? 'right-[10px]' : 'right-0'} pt-[64px] lg:pt-[64px]`}>
+        {/* Use single full image (no-repeat) for the boxed area */}
         <div
-          className="pattern-bg fixed inset-0 -z-10 pointer-events-none"
+          className={`pattern-bg fixed inset-0 -z-10 pointer-events-none`}
           aria-hidden="true"
           style={{
             backgroundImage: `url(${bgPattern})`,
@@ -98,22 +76,26 @@ const LayoutWrapper = ({
           }}
         />
 
+        {/* Content Row (main + sidebar) */}
         <div className="flex flex-1 w-full">
           {/* Main Content */}
           <main
-            className={`flex-1 pt-8 pb-24 lg:pb-32 w-full transition-all duration-300 flex justify-center relative z-10 ${
+            className={`flex-1 pt-8 pb-20 w-full transition-all duration-300 flex justify-center relative z-10 ${
               sidebarOpen ? 'lg:pr-[320px]' : ''
             }`}
           >
             <div className={`w-full px-6 ${sidebarOpen ? 'max-w-4xl' : 'max-w-5xl'}`}>
+              {/* content-box: solid white card (no pattern visible inside) */}
               <div className="content-box">
-                {renderedChildren}
+                {React.cloneElement(children, {
+                  onCompletion: (completed) => setIsCompleted(completed)
+                })}
               </div>
             </div>
           </main>
 
           {/* Sidebar - Desktop Only */}
-          <div className="hidden lg:block fixed right-0 top-16 h-full z-20">
+          <div className={`hidden lg:block fixed ${fixedBackground ? 'right-[10px]' : 'right-0'} top-16 h-full z-20`}>
             <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
           </div>
         </div>
@@ -140,7 +122,6 @@ const LayoutWrapper = ({
                 <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
-            {/* You can optionally render sidebar content for mobile here */}
           </div>
         </div>
       )}

@@ -69,6 +69,7 @@ function App() {
                   nextLabel="Mulai Kuis"
                   nextPath="/loading"
                   nextState={{ quiz }}
+                  fixedBackground={true}
                 >
                   <QuizIntroPage />
                 </LayoutWrapper>
@@ -79,7 +80,7 @@ function App() {
             <Route
               path="/loading"
               element={
-                <LayoutWrapper showBottomNav={false}>
+                <LayoutWrapper showBottomNav={false} fixedBackground={true}>
                   <LoadingPage />
                 </LayoutWrapper>
               }

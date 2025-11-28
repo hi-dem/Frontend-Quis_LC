@@ -17,9 +17,9 @@ const QuizNavigation = ({
   const canSubmit = isLastQuestion && (showFeedback || isTimeUp);
 
   return (
-    <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+    <div className="flex justify-end items-center mt-8 pt-6 border-t border-gray-200">
       <div className="flex gap-2">
-        <button
+        {/* <button
           onClick={onPrevious}
           disabled={!canGoBack}
           className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
@@ -29,9 +29,8 @@ const QuizNavigation = ({
           }`}
         >
           ‹ Sebelumnya
-        </button>
+        </button> */}
         
-        {!isLastQuestion && (
           <button
             onClick={onNext}
             disabled={!canGoForward}
@@ -43,17 +42,17 @@ const QuizNavigation = ({
           >
             Berikutnya ›
           </button>
+
+        {canSubmit && (
+          <button
+            onClick={onSubmit}
+            className="px-6 py-2 rounded-lg text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition"
+          >
+            Selesai & Lihat Hasil
+          </button>
         )}
       </div>
 
-      {canSubmit && (
-        <button
-          onClick={onSubmit}
-          className="px-6 py-2 rounded-lg text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition"
-        >
-          Selesai & Lihat Hasil
-        </button>
-      )}
     </div>
   );
 };

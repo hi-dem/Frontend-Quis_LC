@@ -10,7 +10,7 @@ const QuizIntroPage = () => {
 
   if (!quiz) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="min-h-screen w-full flex items-center justify-center p-6">
         <div className="bg-white rounded-xl shadow p-6 text-center">
           <p className="text-gray-600 mb-4">Quiz data tidak ditemukan</p>
           <Button onClick={() => navigate('/')} variant="primary">
@@ -26,9 +26,9 @@ const QuizIntroPage = () => {
   };
 
   return (
-    <div className="fixed h-[450px] flex items-start justify-center px-6 pt-2">
+    <div className="quiz-hero-wrapper min-h-screen w-full flex items-start justify-center p-6">
       <div className="quiz-hero w-full max-w-4xl mx-auto">
-        {/* Bro wser-like top bar */}
+        {/* Browser-like top bar */}
         <div className="quiz-window-bar rounded-t-2xl flex items-center px-4">
           <div className="window-controls flex items-center gap-3">
             <span className="window-dot dot-red" />
@@ -38,7 +38,7 @@ const QuizIntroPage = () => {
         </div>
 
         {/* Hero body */}
-        <div className="quiz-hero-body w-[750px] bg-pink-900 rounded-b-2xl shadow-lg p-8 text-center">
+        <div className="quiz-hero-body bg-white rounded-b-2xl shadow-lg p-8 text-center">
           <div className="mb-6">
             <div className="inline-block badge-hero bg-blue-600 text-white px-6 py-2 rounded-full font-medium">
               Quiz Submodul

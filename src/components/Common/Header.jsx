@@ -29,7 +29,7 @@ const Header = () => {
       className={`sticky top-0 z-50 backdrop-blur bg-white/90 transition-shadow border-b border-gray-200`}
       style={{ height: 64 }}
     >
-      <div className="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
+      <div className="max-w-8xl mx-auto px-6 h-full flex justify-between items-center">
         <div className="flex items-center gap-3">
           <div className="text-3xl"></div>
           <h1 className="text-xl font-bold text-gray-900">Belajar Dasar AI</h1>

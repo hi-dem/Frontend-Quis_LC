@@ -19,7 +19,7 @@ const AnswerReview = ({ quiz, answers }) => {
         return (
           <div
             key={idx}
-            className="border-l-4 border-blue-500 bg-gray-50 rounded-lg overflow-hidden shadow-sm"
+            className="border-l-4 border-blue-500 bg-gray-50 rounded-lg overflow-hidden shadow-md"
           >
             <button
               onClick={() => setExpandedQuestion(expandedQuestion === idx ? null : idx)}

@@ -33,7 +33,7 @@ const LoadingPage = () => {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden loading-page"
+      className="h-[550px] w-full flex items-center justify-center  p-4 relative overflow-hidden loading-page"
       aria-live="polite"
     >
       <div className="relative z-10 text-center max-w-md">

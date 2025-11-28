@@ -268,7 +268,7 @@ const QuizContainer = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4 md:p-6 relative">
+    <div className={`min-h-screen -translate-y-10  p-4 md:p-6 relative`}>
       {/* Background removed here — LayoutWrapper already provides the page background. */}
 
       <div className="max-w-4xl mx-auto relative z-10">
