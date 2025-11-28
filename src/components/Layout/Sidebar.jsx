@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRightIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
+import { ChevronRightIcon, ListBulletIcon } from '@heroicons/react/24/solid';
 import ModuleList from '../Navigation/ModuleList';
 
 const Sidebar = ({ isOpen, onToggle }) => {
@@ -7,10 +7,10 @@ const Sidebar = ({ isOpen, onToggle }) => {
     return (
       <button
         onClick={onToggle}
-        className="absolute top-6 -left-5 w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-start shadow-lg transition"
+        className="fixed right-0 top-20 w-12 h-12 rounded-l-2xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-lg transition z-30"
         aria-label="Buka Sidebar"
       >
-        <ChevronLeftIcon className="w-5 h-5" />
+        <ListBulletIcon className="w-6 h-6" />
       </button>
     );
   }
@@ -19,20 +19,23 @@ const Sidebar = ({ isOpen, onToggle }) => {
     <aside
       className="bg-white border-l border-gray-200 shadow-sm flex flex-col"
       style={{
-        height: '100vh',
+        height: 'calc(100vh - 64px)',
         width: '320px'
       }}
     >
-      <div className="flex justify-start p-2">
+      {/* Toggle Button - Same size as show button */}
+      <div className="flex justify-start p-3">
         <button
           onClick={onToggle}
-          className="w-9 h-9 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow transition"
+          className="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-lg transition"
           aria-label="Tutup Sidebar"
         >
-          <ChevronRightIcon className="w-5 h-5" />
+          <ChevronRightIcon className="w-6 h-6" />
         </button>
       </div>
-      <div className="flex-1 overflow-y-auto pb-6">
+      
+      {/* Module List */}
+      <div className="flex-1 overflow-y-auto pb-20">
         <ModuleList />
       </div>
     </aside>

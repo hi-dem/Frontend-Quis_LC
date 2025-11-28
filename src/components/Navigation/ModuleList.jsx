@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronRightIcon } from '@heroicons/react/24/solid';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ChevronRightIcon, ChevronDownIcon, LockClosedIcon } from '@heroicons/react/24/solid';
 import mockTopics from '../../data/mockTopics';
 
 const ModuleList = ({ onSelectModule }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [expandedModules, setExpandedModules] = useState({ 1: true });
   const [expandedSubmodules, setExpandedSubmodules] = useState({ '1. 1': true });
+  const [activeItem, setActiveItem] = useState('submodule-1. 1');
 
   const topic = mockTopics[0];
 
@@ -17,15 +19,17 @@ const ModuleList = ({ onSelectModule }) => {
     }));
   };
 
-  const toggleSubmoduleExpand = (submoduleId) => {
+  const toggleSubmoduleExpand = (submoduleId, e) => {
+    e.stopPropagation();
     setExpandedSubmodules(prev => ({
       ...prev,
-      [submoduleId]: ! prev[submoduleId],
+      [submoduleId]: !prev[submoduleId],
     }));
   };
 
   const handleSubmoduleClick = (submodule) => {
-    if (!submodule.isLocked) {
+    if (! submodule.isLocked) {
+      setActiveItem(`submodule-${submodule.id}`);
       navigate('/material', {
         state: {
           submodule,
@@ -35,8 +39,10 @@ const ModuleList = ({ onSelectModule }) => {
     }
   };
 
-  const handleQuizClick = (submodule) => {
-    if (!submodule.isLocked) {
+  const handleQuizClick = (submodule, e) => {
+    e.stopPropagation();
+    if (! submodule.isLocked) {
+      setActiveItem(`quiz-${submodule.id}`);
       navigate('/quiz-intro', {
         state: {
           submodule,
@@ -46,52 +52,65 @@ const ModuleList = ({ onSelectModule }) => {
     }
   };
 
-  const renderQuizItem = (submodule, quizNumber) => (
-    <div
-      key={`quiz-${submodule.id}`}
-      onClick={() => handleQuizClick(submodule)}
-      className={`py-2 px-3 ml-12 rounded cursor-pointer transition-all border-l-4 flex items-center justify-between ${
-        submodule.isLocked ? 'opacity-60 cursor-not-allowed' : 'border-transparent hover:bg-gray-50'
-      }`}
-    >
-      <div className="flex items-center gap-2 flex-1 min-w-0">
-        <span className="text-lg"></span>
-        <p className="text-sm leading-snug truncate text-gray-700">
+  const renderQuizItem = (submodule, quizNumber) => {
+    const isActive = activeItem === `quiz-${submodule.id}`;
+    
+    return (
+      <div
+        key={`quiz-${submodule.id}`}
+        onClick={(e) => handleQuizClick(submodule, e)}
+        className={`py-2 px-3 ml-12 rounded cursor-pointer transition-all flex items-center gap-2 ${
+          submodule.isLocked 
+            ? 'opacity-60 cursor-not-allowed' 
+            : isActive 
+              ?  'bg-blue-50 text-blue-600' 
+              : 'hover:bg-gray-50 text-gray-600'
+        }`}
+      >
+        <p className={`text-sm leading-snug ${isActive ? 'text-blue-600 font-medium' : 'text-gray-600'}`}>
           Quiz Submodul #{quizNumber}
         </p>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderSubmodule = (submodule, index) => {
-    const isSubmoduleExpanded = expandedSubmodules[submodule.id];
+    const isSubmoduleExpanded = expandedSubmodules[submodule. id];
     const quizNumber = index + 1;
+    const isActive = activeItem === `submodule-${submodule.id}`;
 
     return (
-      <div key={submodule.id}>
+      <div key={submodule. id}>
         <div
-          onClick={() => {
-            toggleSubmoduleExpand(submodule.id);
-            handleSubmoduleClick(submodule);
-          }}
-          className={`px-3 ml-6  rounded cursor-pointer transition-all border-l-4 flex items-center justify-between ${
-            submodule.isLocked ?  'opacity-60 cursor-not-allowed' : 'border-transparent hover:bg-gray-50'
+          onClick={() => handleSubmoduleClick(submodule)}
+          className={`px-3 py-2 ml-4 rounded cursor-pointer transition-all flex items-center justify-between ${
+            submodule.isLocked 
+              ? 'opacity-60 cursor-not-allowed' 
+              : isActive 
+                ? 'bg-blue-50' 
+                : 'hover:bg-gray-50'
           }`}
         >
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span
-              className={`transition-transform duration-200 ${
-                isSubmoduleExpanded ? 'rotate-90' : ''
-              }`}
+            <button
+              onClick={(e) => toggleSubmoduleExpand(submodule. id, e)}
+              className="p-0. 5 hover:bg-gray-200 rounded transition"
             >
-              <ChevronRightIcon className="w-4 h-4 text-gray-400" />
-            </span>
-            <span className="text-lg">{submodule.icon}</span>
-            <p className="text-sm leading-snug truncate text-gray-700">
-              {submodule. title}
+              {isSubmoduleExpanded ? (
+                <ChevronDownIcon className="w-4 h-4 text-gray-500" />
+              ) : (
+                <ChevronRightIcon className="w-4 h-4 text-gray-500" />
+              )}
+            </button>
+            <p className={`text-sm leading-snug truncate ${
+              isActive ? 'text-blue-600 font-semibold' : 'text-gray-700'
+            }`}>
+              {submodule.title}
             </p>
           </div>
-          {submodule.isLocked && <span className="text-sm ml-2">🔒</span>}
+          {submodule.isLocked && (
+            <LockClosedIcon className="w-5 h-5 text-orange-300 ml-2 flex-shrink-0" />
+          )}
         </div>
 
         {isSubmoduleExpanded && renderQuizItem(submodule, quizNumber)}
@@ -100,51 +119,46 @@ const ModuleList = ({ onSelectModule }) => {
   };
 
   const renderModule = (module) => {
-    const isModuleExpanded = expandedModules[module.id];
+    const isModuleExpanded = expandedModules[module. id];
 
     return (
-      <div key={module.id} className="mb-2">
+      <div key={module.id} className="mb-1">
         <div
           onClick={() => toggleModuleExpand(module.id)}
-          className="py-2 px-3 rounded cursor-pointer transition-all border-l-4 flex items-center justify-between border-transparent hover:bg-gray-50"
+          className="py-2 px-3 rounded cursor-pointer transition-all flex items-center justify-between hover:bg-gray-50"
         >
           <div className="flex items-center gap-2 flex-1">
-            <span
-              className={`transition-transform duration-200 ${
-                isModuleExpanded ? 'rotate-90' : ''
-              }`}
-            >
-              <ChevronRightIcon className="w-4 h-4 text-gray-400" />
-            </span>
-            <span className="text-lg"></span>
+            {isModuleExpanded ? (
+              <ChevronDownIcon className="w-4 h-4 text-gray-500" />
+            ) : (
+              <ChevronRightIcon className="w-4 h-4 text-gray-500" />
+            )}
             <p className="text-sm font-semibold text-gray-900">
-              {module.title}
+              {module. title}
             </p>
           </div>
         </div>
 
         {isModuleExpanded && module.submodules. length > 0 && (
-          <div className="border-l border-gray-200 ml-2">
-            {module.submodules.map((sub, idx) => renderSubmodule(sub, idx))}
+          <div className="border-l-2 border-gray-200 ml-4">
+            {module.submodules. map((sub, idx) => renderSubmodule(sub, idx))}
           </div>
         )}
       </div>
     );
   };
 
-  if (!topic || !topic.modules) {
+  if (! topic || !topic. modules) {
     return <div className="p-4 text-gray-500">Tidak ada modul tersedia</div>;
   }
 
   return (
-    <div className="bg-white shadow-lg h-full rounded  ">
-      <div className="  p-4">
-        <div className="flex items-center gap-2">
-          <h3 className="text-lg font-bold text-gray-900">Daftar Modul</h3>
-        </div>
+    <div className="bg-white h-full">
+      <div className="p-4 border-b border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900">Daftar Modul</h3>
       </div>
 
-      <div className="p-3 max-h-96 overflow-y-auto space-y-2">
+      <div className="p-3 overflow-y-auto space-y-1">
         {topic.modules.map(module => renderModule(module))}
       </div>  
     </div>
