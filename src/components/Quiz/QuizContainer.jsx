@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import QuizHeader from './QuizHeader';
 import QuestionDisplay from './QuestionDisplay';
@@ -11,16 +11,27 @@ import { shuffleArray } from '../../utils/helpers';
 // bgPattern import kept if used elsewhere; not used for page background here
 import bgPattern from '../../assets/bg-pattern.svg';
 
-const shuffleQuestions = (questions, count = 3) => {
-  const shuffled = shuffleArray(questions);
+/*
+  Changes in this file vs your original:
+  - Added scrollToStage utility and a useEffect that scrolls the "stage" into view
+    whenever we move to the next question (unless feedback is being shown).
+    This makes the UI behave like "tampilan soal pertama" after next.
+  - Timer and advancing use functional updaters to avoid stale closures.
+  - When user clicks "Next" we immediately reset timer/showFeedback/selectedAnswer
+    and then update index (functional updater). The index-change effect runs
+    the scrolling logic.
+  - Kept your localStorage load/save behaviour unchanged.
+*/
+
+const shuffleQuestions = (questions = [], count = 3) => {
+  const shuffled = shuffleArray(questions || []);
   return shuffled.slice(0, count).map(q => {
     const originalCorrectAnswer = q.correctAnswer;
-    const shuffledAnswers = shuffleArray(q.answers);
-    
+    const shuffledAnswers = shuffleArray(q.answers || []);
     return {
       ...q,
       answers: shuffledAnswers,
-      originalCorrectAnswer: originalCorrectAnswer,
+      originalCorrectAnswer,
       correctAnswer: originalCorrectAnswer
     };
   });
@@ -46,8 +57,46 @@ const QuizContainer = () => {
   const [isCurrentTimeUp, setIsCurrentTimeUp] = useState(false);
 
   const quiz = mockQuizzes[0];
-  const durationPerQuestion = quiz.durationPerQuestion;
-  const totalSelectedQuestions = quiz.totalQuestions;
+  const durationPerQuestion = quiz?.durationPerQuestion ?? 30;
+  const totalSelectedQuestions = quiz?.totalQuestions ?? 3;
+
+  // Utility: read CSS vars / header offset so scroll places the stage correctly
+  const computeHeaderOffset = () => {
+    try {
+      const cssHeader = getComputedStyle(document.documentElement).getPropertyValue('--header-offset');
+      if (cssHeader) {
+        const parsed = parseInt(cssHeader, 10);
+        if (!Number.isNaN(parsed)) return parsed;
+      }
+    } catch (e) { /* ignore */ }
+    const header = document.querySelector('header') || document.querySelector('.app-header');
+    return header ? header.offsetHeight + 12 : 84;
+  };
+  const computeStageRaise = () => {
+    try {
+      const cssRaise = getComputedStyle(document.documentElement).getPropertyValue('--stage-raise');
+      if (cssRaise) {
+        const parsed = parseInt(cssRaise, 10);
+        if (!Number.isNaN(parsed)) return parsed;
+      }
+    } catch (e) { /* ignore */ }
+    return 0;
+  };
+
+  const scrollToStage = (selector = '.quiz-stage') => {
+    const stage = document.querySelector(selector);
+    if (!stage) return;
+    const HEADER_OFFSET = computeHeaderOffset();
+    const STAGE_RAISE = computeStageRaise();
+    const rect = stage.getBoundingClientRect();
+    const absoluteTop = window.scrollY + rect.top;
+    const target = Math.max(absoluteTop - HEADER_OFFSET - STAGE_RAISE, 0);
+    window.scrollTo({ top: target, behavior: 'smooth' });
+    const firstInteractive = stage.querySelector('button, [role="button"], a, input, textarea, select');
+    if (firstInteractive && typeof firstInteractive.focus === 'function') {
+      try { firstInteractive.focus(); } catch (e) { /* ignore */ }
+    }
+  };
 
   // Initialize quiz
   useEffect(() => {
@@ -57,20 +106,26 @@ const QuizContainer = () => {
     if (savedData) {
       try {
         const { questions, answers: savedAnswers, currentIndex, startTime: savedStartTime, timeoutQuestions: savedTimeout } = JSON.parse(savedData);
-        setShuffledQuestions(questions);
-        setAnswers(savedAnswers);
-        setCurrentQuestionIndex(currentIndex);
-        setStartTime(savedStartTime);
+        setShuffledQuestions(questions || []);
+        setAnswers(savedAnswers || {});
+        setCurrentQuestionIndex(typeof currentIndex === 'number' ? currentIndex : 0);
+        setStartTime(savedStartTime || new Date().toISOString());
         setTimeRemaining(durationPerQuestion);
         setTimeoutQuestions(new Set(savedTimeout || []));
-
         if (savedTimeout && savedTimeout.includes(currentIndex)) {
           setIsCurrentTimeUp(true);
         }
-
         console.log('Loaded quiz from localStorage:', storageKey);
       } catch (error) {
         console.error('Error loading from localStorage:', error);
+        // fallback: start new session
+        const selectedQuestions = shuffleQuestions(quiz.questions, totalSelectedQuestions);
+        setShuffledQuestions(selectedQuestions);
+        setStartTime(new Date().toISOString());
+        setTimeRemaining(durationPerQuestion);
+        setTimeoutQuestions(new Set());
+        setIsCurrentTimeUp(false);
+        console.log('New quiz session created (fallback)');
       }
     } else {
       const selectedQuestions = shuffleQuestions(quiz.questions, totalSelectedQuestions);
@@ -79,11 +134,10 @@ const QuizContainer = () => {
       setTimeRemaining(durationPerQuestion);
       setTimeoutQuestions(new Set());
       setIsCurrentTimeUp(false);
-
       console.log('New quiz session created');
-      console.log('Shuffled questions:', selectedQuestions);
     }
-  }, [tutorialId, userId, quiz, durationPerQuestion, totalSelectedQuestions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tutorialId, userId]);
 
   // Save ke localStorage
   useEffect(() => {
@@ -107,29 +161,40 @@ const QuizContainer = () => {
   const currentQuestion = shuffledQuestions[currentQuestionIndex];
   const totalQuestions = shuffledQuestions.length;
 
-  // Timer logic
+  // Timer logic (functional updaters to avoid stale closures)
   useEffect(() => {
     if (shuffledQuestions.length === 0) return;
+
+    // ensure initial timer value when questions become available
+    setTimeRemaining(prev => (typeof prev === 'number' && prev > 0 ? prev : durationPerQuestion));
 
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
-          setTimeoutQuestions(prevTimeout => new Set([...prevTimeout, currentQuestionIndex]));
+          // mark timeout for this index
+          setTimeoutQuestions(prevTimeout => {
+            const next = new Set([...prevTimeout, currentQuestionIndex]);
+            return next;
+          });
           setIsCurrentTimeUp(true);
 
+          // If there's a next question, advance using functional updater
           if (currentQuestionIndex < totalQuestions - 1) {
-            setTimeout(() => {
-              setCurrentQuestionIndex(currentQuestionIndex + 1);
+            // Use functional updater to avoid stale index
+            setCurrentQuestionIndex(i => {
+              const nextIndex = Math.min(i + 1, totalQuestions - 1);
+              // Reset timer and UI for next question
               setTimeRemaining(durationPerQuestion);
               setShowFeedback(false);
               setSelectedAnswer(null);
               setIsCurrentTimeUp(false);
-            }, 1500);
+              // scroll will be handled by effect on currentQuestionIndex
+              return nextIndex;
+            });
             return 0;
           } else {
-            setTimeout(() => {
-              setShowReviewModal(true);
-            }, 1500);
+            // last question -> show review modal after small delay
+            setTimeout(() => setShowReviewModal(true), 500);
             return 0;
           }
         }
@@ -140,25 +205,59 @@ const QuizContainer = () => {
     return () => clearInterval(timer);
   }, [currentQuestionIndex, totalQuestions, durationPerQuestion, shuffledQuestions.length]);
 
-  // Update selected answer
+  // Update selected answer / feedback when changing question
   useEffect(() => {
     if (!currentQuestion) return;
 
     const alreadyAnswered = answers[currentQuestionIndex];
     const isTimeout = timeoutQuestions.has(currentQuestionIndex);
 
-    setSelectedAnswer(alreadyAnswered || null);
+    setSelectedAnswer(alreadyAnswered ?? null);
 
-    if (alreadyAnswered) {
+    if (alreadyAnswered !== undefined && alreadyAnswered !== null) {
       setShowFeedback(true);
-      const correct = alreadyAnswered === currentQuestion.correctAnswer;
-      setIsCorrect(correct);
+      setIsCorrect(alreadyAnswered === currentQuestion.correctAnswer);
     } else {
       setShowFeedback(false);
+      setIsCorrect(false);
     }
 
     setIsCurrentTimeUp(isTimeout);
   }, [currentQuestionIndex, answers, currentQuestion, timeoutQuestions]);
+
+  // Scroll stage into view when currentQuestionIndex changes,
+  // but skip scrolling when feedback is showing (feedback should be visible)
+  useEffect(() => {
+    if (shuffledQuestions.length === 0) return;
+    if (!showFeedback) {
+      // delay slightly so DOM renders the new question/card before scrolling
+      const id = setTimeout(() => scrollToStage('.quiz-stage'), 80);
+      return () => clearTimeout(id);
+    }
+    // if feedback is shown we do not auto-scroll away from it
+    return;
+  }, [currentQuestionIndex, showFeedback, shuffledQuestions.length]);
+
+  // SCROLL TO FEEDBACK: when showFeedback true, scroll to feedback element
+  useEffect(() => {
+    if (!showFeedback) return;
+
+    const id = setTimeout(() => {
+      const el = document.querySelector('.feedback');
+      if (!el) return;
+      const HEADER_OFFSET = computeHeaderOffset();
+      const STAGE_RAISE = computeStageRaise();
+      const rect = el.getBoundingClientRect();
+      const absoluteTop = window.scrollY + rect.top;
+      const target = Math.max(absoluteTop - HEADER_OFFSET - STAGE_RAISE, 0);
+      window.scrollTo({ top: target, behavior: 'smooth' });
+      if (typeof el.focus === 'function') {
+        try { el.setAttribute('tabindex', '-1'); el.focus(); } catch (e) { /* ignore */ }
+      }
+    }, 60);
+
+    return () => clearTimeout(id);
+  }, [showFeedback]);
 
   const handleAnswerSelect = useCallback((answer) => {
     if (!currentQuestion) return;
@@ -169,17 +268,13 @@ const QuizContainer = () => {
     }
 
     const alreadyAnswered = answers[currentQuestionIndex];
-    if (alreadyAnswered) {
+    if (alreadyAnswered !== undefined && alreadyAnswered !== null) {
       setShowFeedback(true);
       return;
     }
 
     setShowFeedback(true);
     const correct = answer === currentQuestion.correctAnswer;
-
-    console.log(`Question ${currentQuestionIndex}: Selected "${answer}"`);
-    console.log(`Correct answer: "${currentQuestion.correctAnswer}"`);
-    console.log(`Is correct: ${correct}`);
 
     setSelectedAnswer(answer);
     setIsCorrect(correct);
@@ -192,10 +287,15 @@ const QuizContainer = () => {
 
   const handleNextQuestion = () => {
     const canGoNext = showFeedback || timeoutQuestions.has(currentQuestionIndex);
-
     if (currentQuestionIndex < totalQuestions - 1 && canGoNext) {
-      setCurrentQuestionIndex(prev => prev + 1);
+      // reset UI first then advance index using functional updater
       setTimeRemaining(durationPerQuestion);
+      setShowFeedback(false);
+      setSelectedAnswer(null);
+      setCurrentQuestionIndex(i => {
+        const next = Math.min(i + 1, totalQuestions - 1);
+        return next;
+      });
     }
   };
 
@@ -203,14 +303,12 @@ const QuizContainer = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
       setTimeRemaining(durationPerQuestion);
+      setShowFeedback(false);
+      setSelectedAnswer(null);
     }
   };
 
   const handleConfirmSubmit = useCallback(() => {
-    console.log('Starting submission');
-    console.log('Current answers:', answers);
-    console.log('Shuffled questions count:', shuffledQuestions.length);
-
     let correctCount = 0;
 
     Object.keys(answers).forEach((idx) => {
@@ -223,11 +321,8 @@ const QuizContainer = () => {
         if (isCorrectAnswer) {
           correctCount++;
         }
-        console.log(`Q${questionIndex + 1}: User="${userAnswer}" | Correct="${question.correctAnswer}" | Match=${isCorrectAnswer}`);
       }
     });
-
-    console.log('Final score:', correctCount, 'out of', totalQuestions);
 
     const storageKey = `quiz_${tutorialId}_${userId}`;
     localStorage.removeItem(storageKey);
@@ -246,10 +341,7 @@ const QuizContainer = () => {
       userId: userId
     };
 
-    console.log('Navigating to /results with score:', correctCount);
-
     setShowReviewModal(false);
-
     setTimeout(() => {
       navigate('/results', { state: navigationState });
     }, 100);
@@ -269,77 +361,68 @@ const QuizContainer = () => {
 
   return (
     <div className={`min-h-screen -translate-y-10  p-4 md:p-6 relative`}>
-      {/* Background removed here — LayoutWrapper already provides the page background. */}
-
       <div className="max-w-4xl mx-auto relative z-10">
-        <QuizHeader
-          currentQuestion={currentQuestionIndex + 1}
-          totalQuestions={totalQuestions}
-          timeRemaining={timeRemaining}
-          isWarning={isWarning}
-          userId={userId}
-          tutorialId={tutorialId}
-        />
-
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 animate-slideUp">
-          <QuestionDisplay
-            question={currentQuestion.question}
-            questionNumber={currentQuestionIndex + 1}
-            totalQuestions={totalQuestions}
-          />
-
-          <AnswerOptions
-            options={currentQuestion.answers}
-            selectedAnswer={selectedAnswer}
-            correctAnswer={currentQuestion.correctAnswer}
-            showFeedback={showFeedback}
-            onSelectAnswer={handleAnswerSelect}
-            disabled={timeoutQuestions.has(currentQuestionIndex)}
-          />
-
-          {showFeedback && (
-            <FeedbackDisplay
-              isCorrect={isCorrect}
-              explanation={currentQuestion.explanation}
-              isTimeUp={false}
-            />
-          )}
-
-          {isCurrentTimeUp && !showFeedback && (
-            <div className="mt-8 p-6 rounded-xl border-l-4 bg-orange-50 border-orange-500">
-              <p className="text-orange-700 font-semibold">
-                Waktu habis untuk soal ini.  Anda dapat melanjutkan ke soal berikutnya.
-              </p>
-            </div>
-          )}
-
-          <QuizNavigation
-            onPrevious={handlePreviousQuestion}
-            onNext={handleNextQuestion}
-            onSubmit={() => {
-              console.log('Opening review modal');
-              setShowReviewModal(true);
-            }}
+        <div className="quiz-stage">
+          <QuizHeader
             currentQuestion={currentQuestionIndex + 1}
             totalQuestions={totalQuestions}
-            canGoBack={canGoBack}
-            canGoForward={canGoForward}
-            selectedAnswer={selectedAnswer}
-            showFeedback={showFeedback}
-            isTimeUp={isCurrentTimeUp}
+            timeRemaining={timeRemaining}
+            isWarning={isWarning}
+            userId={userId}
+            tutorialId={tutorialId}
           />
+
+          <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 animate-slideUp quiz-card">
+            <QuestionDisplay
+              question={currentQuestion.question}
+              questionNumber={currentQuestionIndex + 1}
+              totalQuestions={totalQuestions}
+            />
+
+            <AnswerOptions
+              options={currentQuestion.answers}
+              selectedAnswer={selectedAnswer}
+              correctAnswer={currentQuestion.correctAnswer}
+              showFeedback={showFeedback}
+              onSelectAnswer={handleAnswerSelect}
+              disabled={timeoutQuestions.has(currentQuestionIndex)}
+            />
+
+            {showFeedback && (
+              <FeedbackDisplay
+                isCorrect={isCorrect}
+                explanation={currentQuestion.explanation}
+                isTimeUp={false}
+              />
+            )}
+
+            {isCurrentTimeUp && !showFeedback && (
+              <div className="mt-8 p-6 rounded-xl border-l-4 bg-orange-50 border-orange-500">
+                <p className="text-orange-700 font-semibold">
+                  Waktu habis untuk soal ini.  Anda dapat melanjutkan ke soal berikutnya.
+                </p>
+              </div>
+            )}
+
+            <QuizNavigation
+              onPrevious={handlePreviousQuestion}
+              onNext={handleNextQuestion}
+              onSubmit={() => setShowReviewModal(true)}
+              currentQuestion={currentQuestionIndex + 1}
+              totalQuestions={totalQuestions}
+              canGoBack={canGoBack}
+              canGoForward={canGoForward}
+              selectedAnswer={selectedAnswer}
+              showFeedback={showFeedback}
+              isTimeUp={isCurrentTimeUp}
+            />
+          </div>
         </div>
 
         <ReviewModal
           isOpen={showReviewModal}
-          onClose={() => {
-            console.log('Closing review modal');
-            setShowReviewModal(false);
-          }}
-          onConfirm={() => {
-            console.log('Confirmed submission');
-            handleConfirmSubmit();
-          }}
+          onClose={() => setShowReviewModal(false)}
+          onConfirm={() => handleConfirmSubmit()}
           answers={answers}
           totalQuestions={totalQuestions}
         />

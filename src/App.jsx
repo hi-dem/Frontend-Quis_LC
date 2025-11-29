@@ -80,7 +80,7 @@ function App() {
             <Route
               path="/loading"
               element={
-                <LayoutWrapper showBottomNav={false} fixedBackground={true}>
+                <LayoutWrapper showBottomNav={false} showSidebar={false} fixedBackground={true}>
                   <LoadingPage />
                 </LayoutWrapper>
               }
@@ -90,7 +90,7 @@ function App() {
             <Route
               path="/quiz"
               element={
-                <LayoutWrapper showBottomNav={false}>
+                <LayoutWrapper showBottomNav={false} showSidebar={false}>
                   <Quiz />
                 </LayoutWrapper>
               }

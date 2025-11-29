@@ -18,11 +18,18 @@ const LayoutWrapper = ({
   requiresCompletion = false,
   onPrevClick,
   onNextClick,
-  fixedBackground = false
+  fixedBackground = false,
+  showSidebar = true,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if(showSidebar === false) {
+      setSidebarOpen(false);
+    }
+  }, [showSidebar, children]);
 
   useEffect(() => {
     const handleCompletion = (e) => {
@@ -95,9 +102,11 @@ const LayoutWrapper = ({
           </main>
 
           {/* Sidebar - Desktop Only */}
-          <div className={`hidden lg:block fixed ${fixedBackground ? 'right-[10px]' : 'right-0'} top-16 h-full z-20`}>
+          {showSidebar && 
+            <div className={`hidden lg:block fixed ${fixedBackground ? 'right-[10px]' : 'right-0'} top-16 h-full z-20`}>
             <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
           </div>
+          }
         </div>
       </div>
 
