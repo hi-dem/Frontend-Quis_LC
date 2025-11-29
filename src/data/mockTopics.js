@@ -32,7 +32,7 @@ const mockTopics = [
             },
             quiz: {
               id: 'quiz-1-1',
-              title: 'Quiz Submodul #1: Penerangan AI dalam Dunia Nyata',
+              title: 'Quiz Submodul 1: Penerangan AI dalam Dunia Nyata',
               totalQuestions: 3,
               durationPerQuestion: 30
             }
@@ -56,7 +56,7 @@ const mockTopics = [
             },
             quiz: {
               id: 'quiz-1-2',
-              title: 'Quiz Submodul #2: Pengenalan AI',
+              title: 'Quiz Submodul 2: Pengenalan AI',
               totalQuestions: 3,
               durationPerQuestion: 30
             }
@@ -80,7 +80,7 @@ const mockTopics = [
             },
             quiz: {
               id: 'quiz-1-3',
-              title: 'Quiz Submodul #3: Taksonomi AI',
+              title: 'Quiz Submodul 3: Taksonomi AI',
               totalQuestions: 3,
               durationPerQuestion: 30
             }
@@ -100,7 +100,7 @@ const mockTopics = [
             },
             quiz: {
               id: 'quiz-1-4',
-              title: 'Quiz Submodul #4: AI Workflow',
+              title: 'Quiz Submodul 4: AI Workflow',
               totalQuestions: 3,
               durationPerQuestion: 30
             }
@@ -127,7 +127,7 @@ const mockTopics = [
             },
             quiz: {
               id: 'quiz-2-1',
-              title: 'Quiz Submodul #5: Pengenalan Data',
+              title: 'Quiz Submodul 1: Pengenalan Data',
               totalQuestions: 3,
               durationPerQuestion: 30
             }
